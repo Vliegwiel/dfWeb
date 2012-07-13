@@ -64,7 +64,10 @@ namespace Telnet {
     /// Tyler Kline		"clsScriptingTelnet"	<a href="http://www.c-sharpcorner.com/Code/2003/Jan/TelnetScripting.asp">Internet page</a> <br/>
     /// Igor Moochnick	"RemoteConsoleSolution"	<a href="http:http://www.gotdotnet.com/community/usersamples/Default.aspx?query=telnet">Internet page</a> <br/>
     /// </p>
-    /// <p>
+    /// <p> 
+    /// http://invisible-island.net/xterm/ctlseqs/ctlseqs.html#PC-Style%20Function%20Keys
+    /// http://code.google.com/p/mintty/wiki/Keycodes
+    /// 
     /// <a href="http://www.networksorcery.com/enp/protocol/Terminal.htm">http://www.networksorcery.com/enp/protocol/Terminal.htm</a><br/>
     /// <a href="http://members.tripod.com/~ilkerf/cdoc/vt100ref.html">http://members.tripod.com/~ilkerf/cdoc/vt100ref.html</a><br/>
     /// <a href="http://www.klausbasan.de/misc/telnet/index.html">http://www.klausbasan.de/misc/telnet/index.html</a><br/>
@@ -203,7 +206,7 @@ namespace Telnet {
 
         private static Regex REGEXPFONT = new Regex(@"\[\d{1,2}[m]", RegexOptions.Compiled);
         private static Regex REGEXPFONTWEIGHTCOLOR = new Regex(@"\[\d{1,2}\;\d{1,2}[m]", RegexOptions.Compiled);
-        private static Regex REGEXPFONTWEIGHTCOLORBGCOLOR = new Regex(@"\[\d\;\d{1,2}\;\d{1,2}[m]", RegexOptions.Compiled);
+        private static Regex REGEXPFONTWEIGHTCOLORBGCOLOR = new Regex(@"\[\d{1,2}\;\d{1,2}\;\d{1,2}[m]", RegexOptions.Compiled);
 
         // Telnet commands
         const byte TNC_SE = 240; // End of subnegotiation parameters
@@ -707,6 +710,7 @@ namespace Telnet {
 
             // cycle thru the buffer
             int bc = 0;
+
             while (this.buffer != null && bc < bytesRead && bc < this.buffer.Length) {
                 try {
                     switch (this.buffer[bc]) {
@@ -836,7 +840,7 @@ namespace Telnet {
                             if ((firstChar >= 248) && (firstChar < 252)) utfByteLenght = 5;
                             if ((firstChar >= 252) && (firstChar < 253)) utfByteLenght = 6;
 
-                            System.Diagnostics.Debug.WriteLine(this.buffer[bc] + " " + Convert.ToChar(this.buffer[bc]) + " " + Encoding.UTF8.GetString(this.buffer, bc, utfByteLenght));
+                            //System.Diagnostics.Debug.WriteLine(this.buffer[bc] + " " + Convert.ToChar(this.buffer[bc]) + " " + Encoding.UTF8.GetString(this.buffer, bc, utfByteLenght));
                             this.virtualScreen.Write(Encoding.UTF8.GetString(this.buffer, bc, utfByteLenght));
                             bc += (utfByteLenght - 1); // -1 since we allready add one below
                             break;

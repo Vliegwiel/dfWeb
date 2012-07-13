@@ -21,17 +21,26 @@ namespace Telnet.Demo {
         /// Demo for a MS Telnet server
         /// </summary>
         private static void DemoMSTelnetServer(string[] args) {
-            Terminal tn = new Terminal("faf.vliegwiel.org", 8000, 10, 80, 40); // hostname, port, timeout [s], width, height
+            Terminal tn = new Terminal("localhost", 8000, 10, 80, 50); // hostname, port, timeout [s], width, height
             tn.Connect();
 
+            Console.SetWindowSize(80, 50);
+            
             do {
                 //string response = "vliegwiel";
                 if (tn.WaitForChangedScreen()) {
                     Console.Clear();
                     Console.Write(tn.VirtualScreen.Hardcopy().Trim());
                 }
-                ConsoleKeyInfo name = Console.ReadKey();
-                if (name.KeyChar > 0) {
+                if (Console.KeyAvailable || true) {
+                    ConsoleKeyInfo name = Console.ReadKey();
+                        
+                    if (name.Key.ToString().StartsWith("F")) {
+                        string keystring = name.Key.ToString();
+                        int fkey = int.Parse(keystring.Replace("F", ""));
+                        tn.SendResponseFunctionKey(fkey);
+                    }
+                    var mod = name.Modifiers;
                     tn.SendResponse(Convert.ToString(name.KeyChar), false);
                 }
 

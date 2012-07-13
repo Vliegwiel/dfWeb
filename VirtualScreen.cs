@@ -745,8 +745,8 @@ namespace Telnet
 					StringBuilder sb = new StringBuilder(cap);
 					for (int y = 0; y < this.Height; y++) 
 					{
-						if (y>0)
-							sb.Append('\n');
+                        //if (y>0)
+                            //sb.Append('\n');
 						sb.Append(this.GetLine(y + this.offsety));
 					} // for
 					this.screenString = sb.ToString();
