@@ -7,8 +7,10 @@
 // YOU MAY USE THIS CODE: HOWEVER THIS GRANTS NO FUTURE RIGHTS.
 
 using System;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using Win32;
 
 namespace Telnet
 {
@@ -211,7 +213,7 @@ namespace Telnet
 		}
 
 		// screen array [x,y]
-		private char[,] vs = null;
+		private ConsoleChar[,] vs = null;
 		// cache for screen as string
 		string screenString = null;
 		string screenStringLower = null;
@@ -259,7 +261,7 @@ namespace Telnet
 		{
 			this.offsetx = xOffset;
 			this.offsety = yOffset;
-			this.vs = new char[width,height];
+			this.vs = new ConsoleChar[width,height];
 			this.CleanScreen();
 			this.changedScreen = false; // reset becuase constructor
 			this.visibleAreaY0top = 0;
@@ -281,7 +283,7 @@ namespace Telnet
 			{
 				for (int x=0; x < lx; x++) 
 				{
-					this.vs[x,y] = SPACE;
+					this.vs[x,y] = new ConsoleChar(SPACE);
 				}
 			}
 			this.CursorReset(); // cursor back to beginning
@@ -328,7 +330,7 @@ namespace Telnet
 			{
 				for (int x=x0start; x <=x0end; x++) 
 				{
-					this.vs[x,y] = SPACE;
+					this.vs[x,y] = new ConsoleChar(SPACE);
 				}
 			}
 			this.changedScreen = true;
@@ -361,7 +363,7 @@ namespace Telnet
 
 			for (int x=x0s; x <=x0e; x++) 
 			{
-				this.vs[x,y] = SPACE;
+				this.vs[x,y] = new ConsoleChar(SPACE);
 			}
 			this.changedScreen = true;
 		}
@@ -446,30 +448,17 @@ namespace Telnet
 		/// <remarks>
 		/// Changes the output-flag!
 		/// </remarks>
-		/// <param name="writeByte">Output byte</param>
+		/// <param name="writeChar">Output bytes</param>
 		/// <returns>True if byte has been written</returns>
-		public bool WriteByte(char writeByte) 
+		public bool WriteCharacters(ConsoleChar[] writeChar) 
 		{
-			return this.WriteByte(writeByte, true);
-		}
-
-		/// <summary>
-		/// Write a byte to the screen, and set new cursor position.
-		/// </summary>
-		/// <remarks>
-		/// Changes the output-flag!
-		/// </remarks>
-		/// <param name="writeBytes">Output bytes</param>
-		/// <returns>True if byte has been written</returns>
-		public bool WriteByte(char[] writeBytes) 
-		{
-			if (writeBytes==null || writeBytes.Length < 1)
+			if (writeChar==null || writeChar.Length < 1)
 				return false;
 			else 
 			{
-				for (int i=0; i < writeBytes.Length; i++) 
+				for (int i=0; i < writeChar.Length; i++) 
 				{
-					if (!this.WriteByte(writeBytes[i], true))
+					if (!this.WriteCharacter(writeChar[i], true))
 						return false;
 				}
 				return true;
@@ -482,46 +471,39 @@ namespace Telnet
 		/// <remarks>
 		/// Changes the output-flag!
 		/// </remarks>
-		/// <param name="writeByte">Output byte</param>
+		/// <param name="writeChar">Output byte</param>
 		/// <param name="moveCursor">Move the cursor or not</param>
 		/// <returns>True if byte has been written</returns>
-		public bool WriteByte(char writeByte, bool moveCursor) 
-		{
-			if (vs==null)
-				return false;
-			else 
-			{
-				switch((byte)writeByte) 
-				{
-					case 10:
-						// NL
-						this.CursorY0++;
-						break;
-					case 13:
-						// CR
-						this.CursorX0=0;
-						break;
-					default:
-						int y = CursorY0;
-						if (this.visibleAreaY0top>0)
-							y -= this.visibleAreaY0top; 
-						if (y>=0) 
-						{
-							try 
-							{
-								this.vs[CursorX0, y] = writeByte;
-							} 
-							catch
-							{
-								// boundary problems should never occur, however
-							}
-						}
-						if (moveCursor)
-							this.MoveCursor(1);
-						break;
-				}
-				this.changedScreen = true;
-			}
+		public bool WriteCharacter(ConsoleChar writeChar, bool moveCursor = true) {
+            if (vs == null) {
+                return false;
+            }  else {
+                switch ((byte)writeChar.Character) {
+                    case 10:
+                        // NL
+                        this.CursorY0++;
+                        break;
+                    case 13:
+                        // CR
+                        this.CursorX0 = 0;
+                        break;
+                    default:
+                        int y = CursorY0;
+                        if (this.visibleAreaY0top > 0)
+                            y -= this.visibleAreaY0top;
+                        if (y >= 0) {
+                            try {
+                                this.vs[CursorX0, y] = writeChar;
+                            } catch {
+                                // boundary problems should never occur, however
+                            }
+                        }
+                        if (moveCursor)
+                            this.MoveCursor(1);
+                        break;
+                }
+                this.changedScreen = true;
+            }
 			return true;
 		}
 
@@ -549,12 +531,13 @@ namespace Telnet
 		/// </remarks>
 		/// <param name="s">Output string</param>
 		/// <returns>True if string has been written</returns>
-		public bool Write(string s) 
-		{
-			if (s==null)
-				return false;
-			else
-                return this.WriteByte(s.ToCharArray());
+		public bool Write(string s, ConsoleColor Foreground = ConsoleColor.White, ConsoleColor Background = ConsoleColor.Black) {
+			if (s==null) return false;
+
+            var a = from char c in s.ToCharArray()
+                    select new ConsoleChar(c, Foreground, Background);
+
+            return this.WriteCharacters(a.ToArray<ConsoleChar>());
 		}
 
 		/// <summary>
@@ -704,7 +687,7 @@ namespace Telnet
 				char[] la = new char[this.Width];
 				for (int x=0; x < this.Width; x++) 
 				{
-					la[x] = this.vs[x, y0];
+					la[x] = this.vs[x, y0].Character;
 				}
                 return new string(la);
 			}
@@ -718,6 +701,11 @@ namespace Telnet
 		{
 			return this.GetType().FullName + " " + this.Width + " | " + this.Height + " | changed " + this.changedScreen;
 		}
+
+        public ConsoleChar[,] Screen() {
+
+            return vs;
+        }
 
 		/// <summary>
 		/// Return the values as string
@@ -854,4 +842,23 @@ namespace Telnet
 				return null;
 		} // find regular expression
 	} // class
+
+
+    public partial class ConsoleChar {
+
+        public char Character;
+        public ConsoleColor ForeColor;
+        public ConsoleColor BackColor;
+
+        public ConsoleChar(char nChar, ConsoleColor foreground = ConsoleColor.White, ConsoleColor background = ConsoleColor.Black) {
+            this.Character = nChar;
+            this.ForeColor = foreground;
+            this.BackColor = background;
+        }
+
+        public ConsoleEx.Colors GetConsoleExForegroundColor() {
+            return ConsoleEx.Colors.Blue;
+        }
+    }
+
 } // namespace

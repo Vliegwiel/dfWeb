@@ -106,7 +106,7 @@ namespace Telnet {
         // http://en.wikipedia.org/wiki/ANSI_escape_code
         private enum FontStyles {
             Normal = 0,
-            Bold = 1,
+            Bright = 1,
             Faint = 2,
             Italic = 3,
             Underlined = 4,
@@ -379,6 +379,21 @@ namespace Telnet {
         #endregion
 
         #region Send response to Telnet server
+
+        public bool SendResponse(byte[] response) {
+            try {
+                if (!this.IsOpenConnection() || this.tcpClient == null) return false;
+                if (response == null || response.Length < 1) return true; // nothing to do
+
+                this.tcpClient.GetStream().BeginWrite(response, 0, response.Length, this.callBackSend, null);
+                return true;
+            } catch {
+                return false;
+            }
+
+        }
+
+
         /// <summary>
         /// Send a response to the server
         /// </summary>
@@ -719,10 +734,10 @@ namespace Telnet {
                             bc = this.ParseEscSequence(bc, response);
                             break;
                         case CR:
-                            this.virtualScreen.WriteByte((char)CR);
+                            this.virtualScreen.WriteCharacter(new ConsoleChar((char)CR));
                             break;
                         case LF:
-                            this.virtualScreen.WriteByte((char)LF);
+                            this.virtualScreen.WriteCharacter(new ConsoleChar((char)LF));
                             break;
                         // DO
                         case TNC_IAC:
@@ -840,8 +855,7 @@ namespace Telnet {
                             if ((firstChar >= 248) && (firstChar < 252)) utfByteLenght = 5;
                             if ((firstChar >= 252) && (firstChar < 253)) utfByteLenght = 6;
 
-                            //System.Diagnostics.Debug.WriteLine(this.buffer[bc] + " " + Convert.ToChar(this.buffer[bc]) + " " + Encoding.UTF8.GetString(this.buffer, bc, utfByteLenght));
-                            this.virtualScreen.Write(Encoding.UTF8.GetString(this.buffer, bc, utfByteLenght));
+                            this.virtualScreen.Write(Encoding.UTF8.GetString(this.buffer, bc, utfByteLenght), GetCurrentForegroundColor(), ConsoleColor.Black);
                             bc += (utfByteLenght - 1); // -1 since we allready add one below
                             break;
                     } // switch
@@ -1302,6 +1316,55 @@ namespace Telnet {
                 return -1;
         }
         #endregion
+
+        private ConsoleColor GetCurrentForegroundColor() {
+
+            if (this._fontStyle.Contains(FontStyles.Bright)) {
+                switch (this._fontColor) {
+                    case FontColors.Black:
+                        return ConsoleColor.Black;
+                    case FontColors.Blue:
+                        return ConsoleColor.Blue;
+                    case FontColors.Cyan:
+                        return ConsoleColor.Cyan;
+                    case FontColors.Green:
+                        return ConsoleColor.Green;
+                    case FontColors.Magenta:
+                        return ConsoleColor.Magenta;
+                    case FontColors.Red:
+                        return ConsoleColor.Red;
+                    case FontColors.White:
+                        return ConsoleColor.White;
+                    case FontColors.Yellow:
+                        return ConsoleColor.Yellow;
+                    default:
+                        return ConsoleColor.White;
+                }
+            } else {
+                switch (this._fontColor) {
+                    case FontColors.Black:
+                        return ConsoleColor.Black;
+                    case FontColors.Blue:
+                        return ConsoleColor.DarkBlue;
+                    case FontColors.Cyan:
+                        return ConsoleColor.DarkCyan;
+                    case FontColors.Green:
+                        return ConsoleColor.DarkGreen;
+                    case FontColors.Magenta:
+                        return ConsoleColor.DarkMagenta;
+                    case FontColors.Red:
+                        return ConsoleColor.DarkRed;
+                    case FontColors.White:
+                        return ConsoleColor.Gray;
+                    case FontColors.Yellow:
+                        return ConsoleColor.DarkYellow;
+                    default:
+                        return ConsoleColor.White;
+                }
+                
+            }
+            
+        }
 
         private void SetFontSetting(string command) {
             command = command.Replace("[", "").Replace("m", "");
