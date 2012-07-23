@@ -28,7 +28,7 @@ namespace Telnet.Demo {
 
             do {
                 //string response = "vliegwiel";
-                if (tn.WaitForChangedScreen()) {
+                if (tn.WaitForChangedScreen(1)) {
                     ConsoleEx.Cls();
 
                     ConsoleChar[,] Screen = tn.VirtualScreen.Screen();
@@ -40,7 +40,7 @@ namespace Telnet.Demo {
                     }
                 }
 
-                if (Console.KeyAvailable || true) {
+                while (Console.KeyAvailable) {
                     ConsoleKeyInfo name = Console.ReadKey();
                         
                     if (name.Key.ToString().StartsWith("F") && name.Key.ToString().Length >1) {
@@ -59,9 +59,16 @@ namespace Telnet.Demo {
 
         private static string GetKeyPressBytes(ConsoleKeyInfo keypress) {
             string ret = "";
+            const byte ESC = 27;
+
+            if (keypress.Key == ConsoleKey.DownArrow) {
+                ret += Convert.ToChar(ESC);
+                ret += "[OA";
+                return ret;
+            }
 
             if (keypress.Modifiers == ConsoleModifiers.Alt) {
-                ret = "^[";
+                ret += Convert.ToChar(ESC);
             }
             if (keypress.Modifiers == ConsoleModifiers.Control)
             {

@@ -406,7 +406,7 @@ namespace Telnet {
                     return false;
                 if (response == null || response.Length < 1)
                     return true; // nothing to do
-                byte[] sendBuffer = (endLine) ? System.Text.Encoding.ASCII.GetBytes(response + ENDOFLINE) : System.Text.Encoding.ASCII.GetBytes(response);
+                byte[] sendBuffer = (endLine) ? System.Text.Encoding.UTF8.GetBytes(response + ENDOFLINE) : System.Text.Encoding.UTF8.GetBytes(response);
                 if (sendBuffer == null || sendBuffer.Length < 1)
                     return false;
                 this.tcpClient.GetStream().BeginWrite(sendBuffer, 0, sendBuffer.Length, this.callBackSend, null);
@@ -855,7 +855,7 @@ namespace Telnet {
                             if ((firstChar >= 248) && (firstChar < 252)) utfByteLenght = 5;
                             if ((firstChar >= 252) && (firstChar < 253)) utfByteLenght = 6;
 
-                            this.virtualScreen.Write(Encoding.UTF8.GetString(this.buffer, bc, utfByteLenght), GetCurrentForegroundColor(), ConsoleColor.Black);
+                            this.virtualScreen.Write(Encoding.UTF8.GetString(this.buffer, bc, utfByteLenght), GetCurrentForegroundColor(), GetCurrentBackGroundColor());
                             bc += (utfByteLenght - 1); // -1 since we allready add one below
                             break;
                     } // switch
@@ -1364,6 +1364,55 @@ namespace Telnet {
                 
             }
             
+        }
+
+        private ConsoleColor GetCurrentBackGroundColor() {
+
+            if (this._fontStyle.Contains(FontStyles.Bright)) {
+                switch (this._fontBackColor) {
+                    case BackgroundColors.Black:
+                        return ConsoleColor.Black;
+                    case BackgroundColors.Blue:
+                        return ConsoleColor.Blue;
+                    case BackgroundColors.Cyan:
+                        return ConsoleColor.Cyan;
+                    case BackgroundColors.Green:
+                        return ConsoleColor.Green;
+                    case BackgroundColors.Magenta:
+                        return ConsoleColor.Magenta;
+                    case BackgroundColors.Red:
+                        return ConsoleColor.Red;
+                    case BackgroundColors.White:
+                        return ConsoleColor.White;
+                    case BackgroundColors.Yellow:
+                        return ConsoleColor.Yellow;
+                    default:
+                        return ConsoleColor.White;
+                }
+            } else {
+                switch (this._fontBackColor) {
+                    case BackgroundColors.Black:
+                        return ConsoleColor.Black;
+                    case BackgroundColors.Blue:
+                        return ConsoleColor.DarkBlue;
+                    case BackgroundColors.Cyan:
+                        return ConsoleColor.DarkCyan;
+                    case BackgroundColors.Green:
+                        return ConsoleColor.DarkGreen;
+                    case BackgroundColors.Magenta:
+                        return ConsoleColor.DarkMagenta;
+                    case BackgroundColors.Red:
+                        return ConsoleColor.DarkRed;
+                    case BackgroundColors.White:
+                        return ConsoleColor.Gray;
+                    case BackgroundColors.Yellow:
+                        return ConsoleColor.DarkYellow;
+                    default:
+                        return ConsoleColor.White;
+                }
+
+            }
+
         }
 
         private void SetFontSetting(string command) {

@@ -3,11 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Telnet", "Telnet.csproj", "{3DA2C184-11CC-4C5F-B0F3-6BAB2C139656}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dfWebFormTest", "..\dfWebFormTest\dfWebFormTest.csproj", "{7B411DFA-AA41-4441-939B-797030CC90E2}"
-	ProjectSection(ProjectDependencies) = postProject
-		{3DA2C184-11CC-4C5F-B0F3-6BAB2C139656} = {3DA2C184-11CC-4C5F-B0F3-6BAB2C139656}
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -28,16 +23,6 @@ Global
 		{3DA2C184-11CC-4C5F-B0F3-6BAB2C139656}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{3DA2C184-11CC-4C5F-B0F3-6BAB2C139656}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{3DA2C184-11CC-4C5F-B0F3-6BAB2C139656}.Release|x86.ActiveCfg = Release|Any CPU
-		{7B411DFA-AA41-4441-939B-797030CC90E2}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{7B411DFA-AA41-4441-939B-797030CC90E2}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{7B411DFA-AA41-4441-939B-797030CC90E2}.Debug|Mixed Platforms.Build.0 = Debug|x86
-		{7B411DFA-AA41-4441-939B-797030CC90E2}.Debug|x86.ActiveCfg = Debug|x86
-		{7B411DFA-AA41-4441-939B-797030CC90E2}.Debug|x86.Build.0 = Debug|x86
-		{7B411DFA-AA41-4441-939B-797030CC90E2}.Release|Any CPU.ActiveCfg = Release|x86
-		{7B411DFA-AA41-4441-939B-797030CC90E2}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{7B411DFA-AA41-4441-939B-797030CC90E2}.Release|Mixed Platforms.Build.0 = Release|x86
-		{7B411DFA-AA41-4441-939B-797030CC90E2}.Release|x86.ActiveCfg = Release|x86
-		{7B411DFA-AA41-4441-939B-797030CC90E2}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
