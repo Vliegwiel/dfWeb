@@ -406,7 +406,7 @@ namespace Telnet {
                     return false;
                 if (response == null || response.Length < 1)
                     return true; // nothing to do
-                byte[] sendBuffer = (endLine) ? System.Text.Encoding.UTF8.GetBytes(response + ENDOFLINE) : System.Text.Encoding.UTF8.GetBytes(response);
+                byte[] sendBuffer = (endLine) ? System.Text.Encoding.ASCII.GetBytes(response + ENDOFLINE) : System.Text.Encoding.ASCII.GetBytes(response);
                 if (sendBuffer == null || sendBuffer.Length < 1)
                     return false;
                 this.tcpClient.GetStream().BeginWrite(sendBuffer, 0, sendBuffer.Length, this.callBackSend, null);

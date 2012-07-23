@@ -1,6 +1,8 @@
 using System;
 using System.Threading;
 using Win32;
+using System.Threading.Tasks;
+
 
 namespace Telnet.Demo {
 
@@ -9,26 +11,44 @@ namespace Telnet.Demo {
     /// </summary>
     public class TerminalDemo {
 
+        private Terminal tn;
+
         /// <summary>
         /// The main entry point for the application.
         /// Can be used to test the programm and run it from command line.
         /// </summary>
         [STAThread]
         static void Main(string[] args) {
-            DemoMSTelnetServer(args);
+            TerminalDemo td = new TerminalDemo();
+
         }
 
-        /// <summary>
-        /// Demo for a MS Telnet server
-        /// </summary>
-        private static void DemoMSTelnetServer(string[] args) {
-            //Terminal tn = new Terminal("83.223.1.151", 8000, 10, 80, 50); // hostname, port, timeout [s], width, height
-            Terminal tn = new Terminal("faf.vliegwiel.org", 8000, 10, 80, 50); // hostname, port, timeout [s], width, height
+        public TerminalDemo() {
+            tn = new Terminal("faf.vliegwiel.org", 8000, 10, 80, 50); // hostname, port, timeout [s], width, height
             tn.Connect();
 
+            ThreadStart tc1 = new ThreadStart(DrawLoop);
+            ThreadStart tc2 = new ThreadStart(Read);
+
+            Thread t1 = new Thread(tc1);
+            Thread t2 = new Thread(tc2);
+
+            //AsyncContext.Run(() => {
+            //    DrawLoop();
+            //    Read();
+            //});
+
+            t1.Start();
+            t2.Start();
+
+            System.Diagnostics.Debug.Write("TEST");
+
+        }
+
+        public void DrawLoop() {
             do {
                 //string response = "vliegwiel";
-                if (tn.WaitForChangedScreen(1)) {
+                if (tn.WaitForChangedScreen()) {
                     ConsoleEx.Cls();
 
                     ConsoleChar[,] Screen = tn.VirtualScreen.Screen();
@@ -39,11 +59,21 @@ namespace Telnet.Demo {
                         }
                     }
                 }
+            } while (true);
+        }
 
-                while (Console.KeyAvailable) {
+
+        /// <summary>
+        /// Demo for a MS Telnet server
+        /// </summary>
+        private void Read() {
+            //Terminal tn = new Terminal("83.223.1.151", 8000, 10, 80, 50); // hostname, port, timeout [s], width, height
+
+            while (true) {
+                if (Console.KeyAvailable) {
                     ConsoleKeyInfo name = Console.ReadKey();
-                        
-                    if (name.Key.ToString().StartsWith("F") && name.Key.ToString().Length >1) {
+
+                    if (name.Key.ToString().StartsWith("F") && name.Key.ToString().Length > 1) {
                         string keystring = name.Key.ToString();
                         int fkey = int.Parse(keystring.Replace("F", ""));
                         tn.SendResponseFunctionKey(fkey);
@@ -51,27 +81,46 @@ namespace Telnet.Demo {
 
                     tn.SendResponse(GetKeyPressBytes(name), false);
                 }
+            }
 
-            } while (true);
-
-            tn.Close(); 
+            tn.Close();
         }
 
         private static string GetKeyPressBytes(ConsoleKeyInfo keypress) {
             string ret = "";
             const byte ESC = 27;
 
-            if (keypress.Key == ConsoleKey.DownArrow) {
-                ret += Convert.ToChar(ESC);
-                ret += "[OA";
-                return ret;
+            switch (keypress.Key) {
+                case ConsoleKey.UpArrow:
+                    ret += Convert.ToChar(ESC);
+                    ret += "[A";
+                    return ret;
+                case ConsoleKey.DownArrow:
+                    ret += Convert.ToChar(ESC);
+                    ret += "[B";
+                    return ret;
+                case ConsoleKey.LeftArrow:
+                    ret += Convert.ToChar(ESC);
+                    ret += "[D";
+                    return ret;
+                case ConsoleKey.RightArrow:
+                    ret += Convert.ToChar(ESC);
+                    ret += "[C";
+                    return ret;
+                case ConsoleKey.Home:
+                    ret += Convert.ToChar(ESC);
+                    ret += "[H";
+                    return ret;
+                case ConsoleKey.End:
+                    ret += Convert.ToChar(ESC);
+                    ret += "[F";
+                    return ret;
             }
 
             if (keypress.Modifiers == ConsoleModifiers.Alt) {
                 ret += Convert.ToChar(ESC);
             }
-            if (keypress.Modifiers == ConsoleModifiers.Control)
-            {
+            if (keypress.Modifiers == ConsoleModifiers.Control) {
                 ret += "^";
             }
             //if (keypress.Modifiers == ConsoleModifiers.Shift)
@@ -86,7 +135,7 @@ namespace Telnet.Demo {
 
             switch (color) {
                 case ConsoleColor.Black:
-                    return Win32.ConsoleEx.Colors.Black; 
+                    return Win32.ConsoleEx.Colors.Black;
                 case ConsoleColor.Blue:
                     return Win32.ConsoleEx.Colors.LightBlue;
                 case ConsoleColor.Cyan:

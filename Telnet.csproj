@@ -27,7 +27,7 @@
     <StartupObject>Telnet.Demo.TerminalDemo</StartupObject>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <OldToolsVersion>0.0</OldToolsVersion>
     <SccAuxPath />
     <UpgradeBackupLocation />
