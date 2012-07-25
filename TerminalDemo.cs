@@ -24,7 +24,8 @@ namespace Telnet.Demo {
         }
 
         public TerminalDemo() {
-            tn = new Terminal("faf.vliegwiel.org", 8000, 10, 80, 50); // hostname, port, timeout [s], width, height
+            //tn = new Terminal("faf.vliegwiel.org", 8000, 10, 80, 50); // hostname, port, timeout [s], width, height
+            tn = new Terminal("localhost", 8000, 10, 80, 50); // hostname, port, timeout [s], width, height
             tn.Connect();
 
             ThreadStart tc1 = new ThreadStart(DrawLoop);
@@ -48,10 +49,10 @@ namespace Telnet.Demo {
         public void DrawLoop() {
             do {
                 //string response = "vliegwiel";
-                if (tn.WaitForChangedScreen()) {
+                if (tn.WaitForChangedScreen(1)) {
                     ConsoleEx.Cls();
 
-                    ConsoleChar[,] Screen = tn.VirtualScreen.Screen();
+                    ConsoleChar[,] Screen = tn.GetScreenSafe();
                     for (int y = 0; y < Screen.GetLength(1); y++) {
                         for (int x = 0; x < Screen.GetLength(0); x++) {
                             ConsoleChar point = Screen[x, y];
@@ -67,8 +68,6 @@ namespace Telnet.Demo {
         /// Demo for a MS Telnet server
         /// </summary>
         private void Read() {
-            //Terminal tn = new Terminal("83.223.1.151", 8000, 10, 80, 50); // hostname, port, timeout [s], width, height
-
             while (true) {
                 if (Console.KeyAvailable) {
                     ConsoleKeyInfo name = Console.ReadKey();
@@ -115,13 +114,19 @@ namespace Telnet.Demo {
                     ret += Convert.ToChar(ESC);
                     ret += "[F";
                     return ret;
+                case ConsoleKey.F:
+                    if (keypress.Modifiers == ConsoleModifiers.Control) {
+                        return "" + Convert.ToChar(6);
+                    }
+                    return "F";
             }
 
             if (keypress.Modifiers == ConsoleModifiers.Alt) {
                 ret += Convert.ToChar(ESC);
             }
             if (keypress.Modifiers == ConsoleModifiers.Control) {
-                ret += "^";
+                ret += Convert.ToChar(ESC);
+                return ret += keypress.KeyChar;
             }
             //if (keypress.Modifiers == ConsoleModifiers.Shift)
             //{

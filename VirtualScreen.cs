@@ -703,7 +703,7 @@ namespace Telnet
 		}
 
         public ConsoleChar[,] Screen() {
-
+            this.changedScreen = false;
             return vs;
         }
 

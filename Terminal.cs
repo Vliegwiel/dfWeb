@@ -149,6 +149,7 @@ namespace Telnet {
                 return this.virtualScreen;
             }
         }
+
         /// <summary>
         /// Server echo on?
         /// </summary>
@@ -520,6 +521,12 @@ namespace Telnet {
                 Thread.Sleep(sleepTimeMs);
             } while (DateTime.Now <= endTime);
             return found;
+        }
+
+        public ConsoleChar[,] GetScreenSafe() {
+            lock (this.virtualScreen) {
+                return virtualScreen.Screen();
+            }
         }
 
         /// <summary>
