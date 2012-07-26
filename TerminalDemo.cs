@@ -19,6 +19,7 @@ namespace Telnet.Demo {
         /// </summary>
         [STAThread]
         static void Main(string[] args) {
+
             TerminalDemo td = new TerminalDemo();
 
         }
@@ -28,39 +29,42 @@ namespace Telnet.Demo {
             tn = new Terminal("localhost", 8000, 10, 80, 50); // hostname, port, timeout [s], width, height
             tn.Connect();
 
+            Console.WindowHeight = 51;
+            Console.WindowWidth = 80;
+            Console.Title = "DFTerm parsing By Vliegwiel";
+
             ThreadStart tc1 = new ThreadStart(DrawLoop);
             ThreadStart tc2 = new ThreadStart(Read);
 
             Thread t1 = new Thread(tc1);
             Thread t2 = new Thread(tc2);
 
-            //AsyncContext.Run(() => {
-            //    DrawLoop();
-            //    Read();
-            //});
-
             t1.Start();
             t2.Start();
 
-            System.Diagnostics.Debug.Write("TEST");
 
         }
 
         public void DrawLoop() {
+            ConsoleEx.Cls();
             do {
-                //string response = "vliegwiel";
-                if (tn.WaitForChangedScreen(1)) {
-                    ConsoleEx.Cls();
+                if (tn.GetScreenSafe().ChangedScreen) {
 
-                    ConsoleChar[,] Screen = tn.GetScreenSafe();
+                    ConsoleChar[,] Screen = tn.GetScreenSafe().GetScreenUpdate();
+
                     for (int y = 0; y < Screen.GetLength(1); y++) {
                         for (int x = 0; x < Screen.GetLength(0); x++) {
                             ConsoleChar point = Screen[x, y];
-                            ConsoleEx.QPrint(point.Character.ToString(), 0, 0, ConvertColor(point.ForeColor), ConvertColor(point.BackColor));
+
+                            if (point != null) {
+                                if (point.Character > 8720 && point.Character < 8750) point.Character = (char)1;
+                                ConsoleEx.QPrint(point.Character.ToString(), x, y, ConvertColor(point.ForeColor), ConvertColor(point.BackColor));
+                            }
                         }
                     }
                 }
             } while (true);
+            // http://dwarffortresswiki.org/index.php/Character_table
         }
 
 
@@ -119,6 +123,13 @@ namespace Telnet.Demo {
                         return "" + Convert.ToChar(6);
                     }
                     return "F";
+                case ConsoleKey.R:
+                    if (keypress.Modifiers == ConsoleModifiers.Control) {
+                        return "" + Convert.ToChar(18);
+                    }
+                    return "F";
+                case ConsoleKey.Backspace:
+                    return "" + Convert.ToChar(127);
             }
 
             if (keypress.Modifiers == ConsoleModifiers.Alt) {

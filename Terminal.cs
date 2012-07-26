@@ -523,9 +523,9 @@ namespace Telnet {
             return found;
         }
 
-        public ConsoleChar[,] GetScreenSafe() {
+        public VirtualScreen GetScreenSafe() {
             lock (this.virtualScreen) {
-                return virtualScreen.Screen();
+                return virtualScreen;
             }
         }
 
@@ -862,7 +862,8 @@ namespace Telnet {
                             if ((firstChar >= 248) && (firstChar < 252)) utfByteLenght = 5;
                             if ((firstChar >= 252) && (firstChar < 253)) utfByteLenght = 6;
 
-                            this.virtualScreen.Write(Encoding.UTF8.GetString(this.buffer, bc, utfByteLenght), GetCurrentForegroundColor(), GetCurrentBackGroundColor());
+                            string character = Encoding.UTF8.GetString(this.buffer, bc, utfByteLenght);
+                            this.virtualScreen.Write(character, GetCurrentForegroundColor(), GetCurrentBackGroundColor());
                             bc += (utfByteLenght - 1); // -1 since we allready add one below
                             break;
                     } // switch
@@ -1329,7 +1330,7 @@ namespace Telnet {
             if (this._fontStyle.Contains(FontStyles.Bright)) {
                 switch (this._fontColor) {
                     case FontColors.Black:
-                        return ConsoleColor.Black;
+                        return ConsoleColor.Gray;
                     case FontColors.Blue:
                         return ConsoleColor.Blue;
                     case FontColors.Cyan:
@@ -1344,8 +1345,6 @@ namespace Telnet {
                         return ConsoleColor.White;
                     case FontColors.Yellow:
                         return ConsoleColor.Yellow;
-                    default:
-                        return ConsoleColor.White;
                 }
             } else {
                 switch (this._fontColor) {
@@ -1365,12 +1364,9 @@ namespace Telnet {
                         return ConsoleColor.Gray;
                     case FontColors.Yellow:
                         return ConsoleColor.DarkYellow;
-                    default:
-                        return ConsoleColor.White;
                 }
-                
             }
-            
+            return ConsoleColor.White;
         }
 
         private ConsoleColor GetCurrentBackGroundColor() {

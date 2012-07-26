@@ -467,7 +467,7 @@ namespace Win32 {
         /// </history>
         ///-----------------------------------------------------------------------------
         public static int QPrint(string text, int x, int y, Colors foreColor, Colors backColor) {
-            //ConsoleEx.Cursor.Move(x, y);
+            ConsoleEx.Cursor.Move(x, y);
             ConsoleEx.ForeColor = foreColor;
             ConsoleEx.BackColor = backColor;
             Console.Write(text);

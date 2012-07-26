@@ -214,6 +214,7 @@ namespace Telnet
 
 		// screen array [x,y]
 		private ConsoleChar[,] vs = null;
+        private ConsoleChar[,] vsupdated = null;
 		// cache for screen as string
 		string screenString = null;
 		string screenStringLower = null;
@@ -262,6 +263,7 @@ namespace Telnet
 			this.offsetx = xOffset;
 			this.offsety = yOffset;
 			this.vs = new ConsoleChar[width,height];
+            this.vsupdated = new ConsoleChar[width, height];
 			this.CleanScreen();
 			this.changedScreen = false; // reset becuase constructor
 			this.visibleAreaY0top = 0;
@@ -493,6 +495,7 @@ namespace Telnet
                             y -= this.visibleAreaY0top;
                         if (y >= 0) {
                             try {
+                                this.vsupdated[CursorX0, y] = writeChar;
                                 this.vs[CursorX0, y] = writeChar;
                             } catch {
                                 // boundary problems should never occur, however
@@ -702,9 +705,16 @@ namespace Telnet
 			return this.GetType().FullName + " " + this.Width + " | " + this.Height + " | changed " + this.changedScreen;
 		}
 
-        public ConsoleChar[,] Screen() {
+        public ConsoleChar[,] GetCurrentScreen() {
             this.changedScreen = false;
-            return vs;
+            return this.vs;
+        }
+
+        public ConsoleChar[,] GetScreenUpdate() {
+            this.changedScreen = false;
+            ConsoleChar[,] ret = (ConsoleChar[,])this.vsupdated.Clone();
+            this.vsupdated = new ConsoleChar[Width,Height]; 
+            return ret;
         }
 
 		/// <summary>
