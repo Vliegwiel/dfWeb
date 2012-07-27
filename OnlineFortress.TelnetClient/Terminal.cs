@@ -17,7 +17,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Collections.Generic;
 
-namespace Telnet {
+namespace OnlineFortress.TelnetClient {
     /// <summary>
     /// Supports telnet connectivity.
     /// <p>

@@ -10,10 +10,8 @@ using System;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using Win32;
 
-namespace Telnet
-{
+namespace OnlineFortress.TelnetClient {
 	/// <summary>
 	/// Implements a simple "screen". This is used by telnet.
 	/// <p>
@@ -864,10 +862,6 @@ namespace Telnet
             this.Character = nChar;
             this.ForeColor = foreground;
             this.BackColor = background;
-        }
-
-        public ConsoleEx.Colors GetConsoleExForegroundColor() {
-            return ConsoleEx.Colors.Blue;
         }
     }
 

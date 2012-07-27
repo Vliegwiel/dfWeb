@@ -1,10 +1,12 @@
 using System;
 using System.Threading;
-using Win32;
 using System.Threading.Tasks;
 
+using Win32;
 
-namespace Telnet.Demo {
+using OnlineFortress.TelnetClient;
+
+namespace OnlineFortress.Console {
 
     /// <summary>
     /// <a href="http://www.klausbasan.de/misc/telnet/index.html">Further details</a>
@@ -13,25 +15,13 @@ namespace Telnet.Demo {
 
         private Terminal tn;
 
-        /// <summary>
-        /// The main entry point for the application.
-        /// Can be used to test the programm and run it from command line.
-        /// </summary>
-        [STAThread]
-        static void Main(string[] args) {
-
-            TerminalDemo td = new TerminalDemo();
-
-        }
-
-        public TerminalDemo() {
-            //tn = new Terminal("faf.vliegwiel.org", 8000, 10, 80, 50); // hostname, port, timeout [s], width, height
-            tn = new Terminal("localhost", 8000, 10, 80, 50); // hostname, port, timeout [s], width, height
+        public TerminalDemo(string host) {
+            tn = new Terminal(host, 8000, 10, 80, 50); // hostname, port, timeout [s], width, height
             tn.Connect();
 
-            Console.WindowHeight = 51;
-            Console.WindowWidth = 80;
-            Console.Title = "DFTerm parsing By Vliegwiel";
+            System.Console.WindowHeight = 51;
+            System.Console.WindowWidth = 80;
+            System.Console.Title = "DFTerm parsing By Vliegwiel";
 
             ThreadStart tc1 = new ThreadStart(DrawLoop);
             ThreadStart tc2 = new ThreadStart(Read);
@@ -41,8 +31,6 @@ namespace Telnet.Demo {
 
             t1.Start();
             t2.Start();
-
-
         }
 
         public void DrawLoop() {
@@ -57,7 +45,9 @@ namespace Telnet.Demo {
                             ConsoleChar point = Screen[x, y];
 
                             if (point != null) {
-                                if (point.Character > 8720 && point.Character < 8750) point.Character = (char)1;
+                                if (point.Character == 8729) {
+                                    point = new ConsoleChar((char)1, ConsoleColor.Black, ConsoleColor.Green);
+                                }
                                 ConsoleEx.QPrint(point.Character.ToString(), x, y, ConvertColor(point.ForeColor), ConvertColor(point.BackColor));
                             }
                         }
@@ -73,8 +63,8 @@ namespace Telnet.Demo {
         /// </summary>
         private void Read() {
             while (true) {
-                if (Console.KeyAvailable) {
-                    ConsoleKeyInfo name = Console.ReadKey();
+                if (System.Console.KeyAvailable) {
+                    ConsoleKeyInfo name = System.Console.ReadKey();
 
                     if (name.Key.ToString().StartsWith("F") && name.Key.ToString().Length > 1) {
                         string keystring = name.Key.ToString();
