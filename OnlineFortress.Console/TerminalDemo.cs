@@ -117,7 +117,7 @@ namespace OnlineFortress.Console {
                     if (keypress.Modifiers == ConsoleModifiers.Control) {
                         return "" + Convert.ToChar(18);
                     }
-                    return "F";
+                    return "R";
                 case ConsoleKey.Backspace:
                     return "" + Convert.ToChar(127);
             }
