@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Threading;
 using System.Threading.Tasks;
 
 using SignalR;
@@ -11,20 +12,20 @@ using SignalR.Infrastructure;
 using OnlineFortress.TelnetClient;
 using OnlineFortress.Site.Connection;
 
-using System.Threading;
-
-
 namespace OnlineFortress.Site.Hubs {
 
     [HubName("Game")]    
     public class Game : Hub, IConnected, IDisconnect {
 
-        private Terminal tn;
+        private static int _gameLoopRunning;
+        private const int FPSLIMIT = 10;
 
-        public Game() {
+        public Task Connect() {
 
+            EnsureGameLoop();
+
+            return Clients.connectCallback(Context.ConnectionId);
         }
-
 
         [HubMethodName("Chat")]
         public void Chat(string name, string message) {
@@ -34,37 +35,64 @@ namespace OnlineFortress.Site.Hubs {
 
         [HubMethodName("SendKey")]
         public void SendKey(byte characterWich, bool hasAlt, bool hasCntrl, bool hasShift) {
-            tn = TerminalConnection.GetSingleton();
+            Terminal tn = TerminalConnection.GetSingleton();
             tn.SendResponse(Helpers.KeyBinder.ParsKeypress(characterWich, hasAlt, hasCntrl, hasShift));
         }
 
-
+        public void EnsureGameLoop() {
+            if (Interlocked.Exchange(ref _gameLoopRunning, 1) == 0) {
+                new Thread(_ => GameLoop()).Start();
+            }
+        }
 
         [HubMethodName("DrawFullScreen")]
         public void DrawFullScreen() {
-            tn = TerminalConnection.GetSingleton();
 
-            var bln = tn.IsOpenConnection();
-            //while (bln) {
-            var matrix = new Dictionary<int, Dictionary<int, ConsoleChar>>();
-            var Screen = tn.GetScreenSafe().GetCurrentScreen();
-            
-            for (int y = 0; y < Screen.GetLength(1); y++) {
-                var xaxis = new Dictionary<int, ConsoleChar>();
-                    for (int x = 0; x < Screen.GetLength(0); x++) {
-                    //ConsoleChar point = Screen[x, y];
-                    xaxis.Add(x, Screen[x,y]);
-                }
-                matrix.Add(y, xaxis);
-            }
-            Caller.ScreenUpdate(matrix);    
         }
 
-        public Task Connect() {
-            return Clients.connectCallback(Context.ConnectionId);
+
+        private static void GameLoop() {
+
+            int frameTicks = (int)Math.Round(1000.0 / FPSLIMIT);
+            int lastUpdate = 0;
+
+            var context = GlobalHost.ConnectionManager.GetHubContext<Game>();
+            Terminal tn = TerminalConnection.GetSingleton();
+
+            var dict = new Dictionary<int, int>();
+
+            while (tn.IsOpenConnection()) {
+                int delta = (lastUpdate + frameTicks) - Environment.TickCount;
+                if (delta < 0) {
+                    lastUpdate = Environment.TickCount;
+
+                    if (tn.GetScreenSafe().ChangedScreen) {
+
+                        var matrix = new Dictionary<int, Dictionary<int, ConsoleChar>>();
+                        var Screen = tn.GetScreenSafe().GetScreenUpdate();
+
+                        for (int y = 0; y < Screen.GetLength(1); y++) {
+                            var xaxis = new Dictionary<int, ConsoleChar>();
+                            for (int x = 0; x < Screen.GetLength(0); x++) {
+                                //ConsoleChar point = Screen[x, y];
+                                if (Screen[x, y] != null) {
+                                    xaxis.Add(x, Screen[x, y]);
+                                }
+                            }
+                            matrix.Add(y, xaxis);
+                        }
+                        context.Clients.ScreenUpdate(matrix);
+                    }
+                    
+                } else {
+                    //System.Diagnostics.Debug.WriteLine("{0} -{1} Going to sleep for {2} ms", DateTime.Now.TimeOfDay, DateTime.Now.Second ,TimeSpan.FromTicks(delta));
+                    Thread.Sleep(TimeSpan.FromTicks(delta));
+                }
+            }
         }
 
         public Task Reconnect(IEnumerable<string> groups) {
+            EnsureGameLoop();
             return null;
         }
 
