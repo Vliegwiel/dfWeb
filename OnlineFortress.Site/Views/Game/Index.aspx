@@ -35,18 +35,23 @@
                 //BackColor                0
                 //Character                "╔"
                 //ForeColor                9
-                var canvas = document.getElementById("gamefield");
-                var ctx = canvas.getContext("2d");
-                ctx.font = "16px mayday-no-highlight";
-                ctx.textBaseline = "top";
+                var canvasBack = document.getElementById("gamefieldBack");
+                var canvasFront = document.getElementById("gamefieldFront");
+                var ctxBack = canvasBack.getContext("2d");
+                var ctxFront = canvasFront.getContext("2d");
+                ctxFront.font = "16px mayday-no-highlight";
+                ctxFront.textBaseline = "top";
 
                 for (y in screen) {
                     for (x in screen[y]) {
-                        ctx.clearRect(x * 16, y * 16, 16, 16);
-                        ctx.fillStyle = "#000";
-                        ctx.fillRect(x * 16, y * 16, 16, 16); 
-                        ctx.fillStyle = "#CCC";
-                        ctx.fillText(screen[y][x].Character, x * 16, y * 16);
+                        ctxBack.clearRect(x * 16, y * 16, 16, 16);
+                        ctxBack.fillStyle = colorNumerToHex(screen[y][x].BackColor);
+                        ctxBack.fillRect(x * 16, y * 16, 16, 16);   
+
+                        ctxFront.clearRect(x * 16, y * 16, 16, 16);
+                        ctxFront.fillStyle = colorNumerToHex(screen[y][x].ForeColor);
+                        ctxFront.fillText(screen[y][x].Character, x * 16, y * 16);
+                            
                     }
                 }
 
@@ -56,13 +61,13 @@
 
             // Setup keybinding
             var xTriggered = 0;
-            $("#gamefield").keypress(function (event) {
+            $("#inp").keypress(function (event) {
                 //if (event.which != 0) {
-                    // allow for f5 to function !? 
-                    //event.preventDefault();
+                // allow for f5 to function !? 
+                //event.preventDefault();
                 // }
-                console.log(event);
-                gameHub.sendKey(event.which, event.altKey, event.ctrlKey, event.shiftKey);
+                console.log(event.which +  " || " + event.keyCode);
+                gameHub.sendKey(event.which, event.keyCode, event.altKey, event.ctrlKey, event.shiftKey);
             });
 
         });
@@ -75,7 +80,45 @@
             var screen = gameHub.drawFullScreen();
         }
 
-
+        // Convert an consoleColor to an html color;
+        function colorNumerToHex(color) {
+        
+            switch (color) {
+                case 0:
+                    return "#000000";
+                case 1:
+                    return "#0000BB";
+                case 2:
+                    return "#00BB00";
+                case 3:
+                    return "#00BBBB";
+                case 4:
+                    return "#BB0000";
+                case 5:
+                    return "#BB00BB";
+                case 6:
+                    return "#BBBB00";        
+                case 7:
+                    return "#BBBBBB";
+                case 8:
+                    return "#555555";
+                case 9:
+                    return "#5555FF";
+                case 10:
+                    return "#55FF55";
+                case 11:
+                    return "#55FFFF";
+                case 12:
+                    return "#FF5555";
+                case 13:
+                    return "#FF55FF";
+                case 14:
+                    return "#FFFF55";
+                case 15:
+                    return "#FFFFFF";
+            }
+            return "FF0099";
+        }
 
     </script>
     <style type="text/css" media="all">
@@ -101,71 +144,6 @@
             height: 20px;
             width: 20px;
         }
-        .bg0
-        {
-            background: #000;
-        }
-        .bg1
-        {
-            background: rgb(0, 0, 187);
-        }
-        .bg2
-        {
-            background: rgb(0, 187, 0);
-        }
-        .bg3
-        {
-            background: rgb(0, 187, 187);
-        }
-        .bg4
-        {
-            background: rgb(187, 0, 0);
-        }
-        .bg5
-        {
-            background: rgb(187, 0, 187);
-        }
-        .bg6
-        {
-            background: rgb(187, 187, 0);
-        }
-        .bg7
-        {
-            background: rgb(187, 187, 187);
-        }
-        .bg8
-        {
-            background: rgb(85, 85, 85);
-        }
-        .bg9
-        {
-            background: rgb(85, 85, 255);
-        }
-        .bg10
-        {
-            background: rgb(85, 255, 85);
-        }
-        .bg11
-        {
-            background: rgb(85, 255, 255);
-        }
-        .bg12
-        {
-            background: rgb(255, 85, 85);
-        }
-        .bg13
-        {
-            background: rgb(255, 85, 255);
-        }
-        .bg14
-        {
-            background: rgb(255, 255, 85);
-        }
-        .bg15
-        {
-            background: #FFF;
-        }
-        
         .col0
         {
             color: #000;
@@ -220,8 +198,12 @@
 <body>
     <div>
         <!--<textarea id="output" rows="20" cols="80"></textarea>-->
-        <input type="button" onclick="DrawFullScreen();" title="update" value="update" /><br />
-        <canvas id="gamefield" width="1280px" height="800px"></canvas>
+        <input type="button" onclick="DrawFullScreen();" title="update" value="update" /><input type="text" id="inp" /><br />
+        <div id="gamegrid">
+            <canvas id="gamefieldBack" width="1280px" height="800px" style="position: absolute; z-index: 9;"></canvas>
+            <canvas id="gamefieldFront" width="1280px" height="800px" style="position: absolute; z-index: 10;" ></canvas>
+        </div>
+        
         <br />
     </div>
 </body>
