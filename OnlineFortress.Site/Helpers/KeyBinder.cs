@@ -53,6 +53,8 @@ namespace OnlineFortress.Site.Helpers {
                     }
                     // Needed for up down keys etc
                     break;
+                case 8:
+                    return new byte[] { 127 };
             }
 
             if (hasAlt) {

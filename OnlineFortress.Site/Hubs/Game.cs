@@ -18,7 +18,7 @@ namespace OnlineFortress.Site.Hubs {
     public class Game : Hub, IConnected, IDisconnect {
 
         private static int _gameLoopRunning;
-        private const int FPSLIMIT = 10;
+        private const int FPSLIMIT = 4;
 
         public Task Connect() {
 
@@ -34,9 +34,9 @@ namespace OnlineFortress.Site.Hubs {
         }
 
         [HubMethodName("SendKey")]
-        public void SendKey(byte characterWich, bool hasAlt, bool hasCntrl, bool hasShift) {
+        public void SendKey(byte characterWich, byte keycode, bool hasAlt, bool hasCntrl, bool hasShift) {
             Terminal tn = TerminalConnection.GetSingleton();
-            tn.SendResponse(Helpers.KeyBinder.ParsKeypress(characterWich, hasAlt, hasCntrl, hasShift));
+            tn.SendResponse(Helpers.KeyBinder.ParsKeypress(characterWich, keycode, hasAlt, hasCntrl, hasShift));
         }
 
         public void EnsureGameLoop() {
@@ -85,7 +85,6 @@ namespace OnlineFortress.Site.Hubs {
                     }
                     
                 } else {
-                    //System.Diagnostics.Debug.WriteLine("{0} -{1} Going to sleep for {2} ms", DateTime.Now.TimeOfDay, DateTime.Now.Second ,TimeSpan.FromTicks(delta));
                     Thread.Sleep(TimeSpan.FromTicks(delta));
                 }
             }
