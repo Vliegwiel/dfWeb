@@ -11,6 +11,7 @@
     <script type="text/javascript">
         var ConnectionId = "";
 
+        var tilesize = 16;
         var height = 50;
         var width = 80;
 
@@ -41,17 +42,19 @@
                 var ctxFront = canvasFront.getContext("2d");
                 ctxFront.font = "16px mayday-no-highlight";
                 ctxFront.textBaseline = "top";
+                console.log(screen);
 
                 for (y in screen) {
+                    var screeny = y * tilesize;
                     for (x in screen[y]) {
-                        ctxBack.clearRect(x * 16, y * 16, 16, 16);
+                        ctxBack.clearRect(x * tilesize, screeny, tilesize, tilesize);
                         ctxBack.fillStyle = colorNumerToHex(screen[y][x].BackColor);
-                        ctxBack.fillRect(x * 16, y * 16, 16, 16);   
+                        ctxBack.fillRect(x * tilesize, screeny, tilesize, tilesize);
 
-                        ctxFront.clearRect(x * 16, y * 16, 16, 16);
+                        ctxFront.clearRect(x * tilesize, screeny, tilesize, tilesize);
                         ctxFront.fillStyle = colorNumerToHex(screen[y][x].ForeColor);
-                        ctxFront.fillText(screen[y][x].Character, x * 16, y * 16);
-                            
+                        ctxFront.fillText(screen[y][x].Character, x * tilesize, screeny);
+
                     }
                 }
 
@@ -63,10 +66,10 @@
             var xTriggered = 0;
             $("#inp").keypress(function (event) {
                 //if (event.which != 0) {
-                // allow for f5 to function !? 
-                //event.preventDefault();
-                // }
-                console.log(event.which +  " || " + event.keyCode);
+                //allow for f5 to function !? 
+                event.preventDefault();
+                //}
+                console.log(event.which + " || " + event.keyCode);
                 gameHub.sendKey(event.which, event.keyCode, event.altKey, event.ctrlKey, event.shiftKey);
             });
 
@@ -82,7 +85,6 @@
 
         // Convert an consoleColor to an html color;
         function colorNumerToHex(color) {
-        
             switch (color) {
                 case 0:
                     return "#000000";
@@ -122,86 +124,24 @@
 
     </script>
     <style type="text/css" media="all">
-        *
-        {
+        * {
             margin: 0;
             padding: 0;
         }
-        .clear
-        {
+        .clear {
             clear: both;
         }
-        
-        #gamegrid
-        {
-            font-family: mayday-no-highlight;
-            font-size: 16pt;
+        body {
+            background-color: #000;
         }
-        
-        .cell
-        {
-            float: left;
-            height: 20px;
-            width: 20px;
-        }
-        .col0
-        {
-            color: #000;
-        }
-        .col1
-        {
-            color: rgb(0, 0, 187);
-        }
-        .col2
-        {
-            color: rgb(0, 187, 0);
-        }
-        .col3
-        {
-            color: rgb(0, 187, 187);
-        }
-        .col4
-        {
-            color: rgb(187, 0, 0);
-        }
-        .col5
-        {
-            color: rgb(187, 0, 187);
-        }
-        .col6
-        {
-            color: rgb(187, 187, 0);
-        }
-        .col7
-        {
-            color: rgb(187, 187, 187);
-        }
-        .col8
-        {
-            color: rgb(85, 85, 85);
-        }
-        .col9
-        {
-            color: rgb(85, 85, 255);
-        }
-        .col10
-        {
-            color: rgb(85, 255, 85);
-        }
-        .col11 { color: rgb(85, 255, 255);}
-        .col12 { color: rgb(255, 85, 85); }
-        .col13 { color: rgb(255, 85, 255); }
-        .col14 { color: rgb(255, 255, 85); }
-        .col15 { color: #FFF; }
     </style>
 </head>
 <body>
     <div>
-        <!--<textarea id="output" rows="20" cols="80"></textarea>-->
         <input type="button" onclick="DrawFullScreen();" title="update" value="update" /><input type="text" id="inp" /><br />
         <div id="gamegrid">
-            <canvas id="gamefieldBack" width="1280px" height="800px" style="position: absolute; z-index: 9;"></canvas>
-            <canvas id="gamefieldFront" width="1280px" height="800px" style="position: absolute; z-index: 10;" ></canvas>
+            <canvas id="gamefieldBack" width="1280px" height="1024px" style="position: absolute; z-index: 9;"></canvas>
+            <canvas id="gamefieldFront" width="1280px" height="1024px" style="position: absolute; z-index: 10;" ></canvas>
         </div>
         
         <br />

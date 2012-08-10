@@ -523,6 +523,14 @@ namespace OnlineFortress.TelnetClient {
             return found;
         }
 
+        /// <summary>
+        /// Perform an non locked check for changes onscreen
+        /// </summary>
+        /// <returns></returns>
+        public Boolean HasUpdate() {
+            return virtualScreen.ChangedScreen;
+        }
+
         public VirtualScreen GetScreenSafe() {
             lock (this.virtualScreen) {
                 return virtualScreen;

@@ -47,7 +47,22 @@ namespace OnlineFortress.Site.Hubs {
 
         [HubMethodName("DrawFullScreen")]
         public void DrawFullScreen() {
+            Terminal tn = TerminalConnection.GetSingleton();
+            
+            var matrix = new Dictionary<int, Dictionary<int, ConsoleChar>>();
+            var screen = tn.GetScreenSafe().GetCurrentScreen();
 
+            for (int y = 0; y < screen.GetLength(1); y++) {
+                var xaxis = new Dictionary<int, ConsoleChar>();
+                for (int x = 0; x < screen.GetLength(0); x++) {
+                    //ConsoleChar point = Screen[x, y];
+                    if (screen[x, y] != null) {
+                        xaxis.Add(x, screen[x, y]);
+                    }
+                }
+                matrix.Add(y, xaxis);
+            }
+            Caller.ScreenUpdate(matrix);
         }
 
 
@@ -66,7 +81,7 @@ namespace OnlineFortress.Site.Hubs {
                 if (delta < 0) {
                     lastUpdate = Environment.TickCount;
 
-                    if (tn.GetScreenSafe().ChangedScreen) {
+                    if (tn.HasUpdate()) {
 
                         var matrix = new Dictionary<int, Dictionary<int, ConsoleChar>>();
                         var Screen = tn.GetScreenSafe().GetScreenUpdate();
@@ -83,7 +98,6 @@ namespace OnlineFortress.Site.Hubs {
                         }
                         context.Clients.ScreenUpdate(matrix);
                     }
-                    
                 } else {
                     Thread.Sleep(TimeSpan.FromTicks(delta));
                 }
