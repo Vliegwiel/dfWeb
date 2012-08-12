@@ -68,7 +68,7 @@ namespace OnlineFortress.Site.Hubs {
 
         private static void GameLoop() {
 
-            int frameTicks = (int)Math.Round(1000.0 / FPSLIMIT);
+            int ticksPerFrame = (int)Math.Round(1000.0 / FPSLIMIT);
             int lastUpdate = 0;
 
             var context = GlobalHost.ConnectionManager.GetHubContext<Game>();
@@ -77,30 +77,33 @@ namespace OnlineFortress.Site.Hubs {
             var dict = new Dictionary<int, int>();
 
             while (tn.IsOpenConnection()) {
-                int delta = (lastUpdate + frameTicks) - Environment.TickCount;
-                if (delta < 0) {
-                    lastUpdate = Environment.TickCount;
+                var startTicks = Environment.TickCount;
+                
+                if (tn.HasUpdate()) {
+                    var matrix = new Dictionary<int, Dictionary<int, ConsoleChar>>();
+                    var Screen = tn.GetScreenSafe().GetScreenUpdate();
 
-                    if (tn.HasUpdate()) {
-
-                        var matrix = new Dictionary<int, Dictionary<int, ConsoleChar>>();
-                        var Screen = tn.GetScreenSafe().GetScreenUpdate();
-
-                        for (int y = 0; y < Screen.GetLength(1); y++) {
-                            var xaxis = new Dictionary<int, ConsoleChar>();
-                            for (int x = 0; x < Screen.GetLength(0); x++) {
-                                //ConsoleChar point = Screen[x, y];
-                                if (Screen[x, y] != null) {
-                                    xaxis.Add(x, Screen[x, y]);
-                                }
+                    for (int y = 0; y < Screen.GetLength(1); y++) {
+                        var xaxis = new Dictionary<int, ConsoleChar>();
+                        for (int x = 0; x < Screen.GetLength(0); x++) {
+                            //ConsoleChar point = Screen[x, y];
+                            if (Screen[x, y] != null) {
+                                xaxis.Add(x, Screen[x, y]);
                             }
-                            matrix.Add(y, xaxis);
                         }
-                        context.Clients.ScreenUpdate(matrix);
+                        matrix.Add(y, xaxis);
                     }
-                } else {
-                    Thread.Sleep(TimeSpan.FromTicks(delta));
+                    context.Clients.ScreenUpdate(matrix);
+                    
                 }
+
+                int timeTicksLeft = (startTicks + ticksPerFrame) - Environment.TickCount;
+                if (timeTicksLeft > 0) {
+                    System.Diagnostics.Debug.WriteLine("{2} Sec {0} sleeping {1}ms", DateTime.Now.Second, timeTicksLeft, Thread.CurrentThread.ManagedThreadId);
+                    Thread.Sleep(timeTicksLeft);
+                }
+
+                
             }
         }
 

@@ -855,14 +855,17 @@ namespace OnlineFortress.TelnetClient {
     public partial class ConsoleChar {
 
         public char Character;
+        public int tempChar;
         public ConsoleColor ForeColor;
         public ConsoleColor BackColor;
 
         public ConsoleChar(char nChar, ConsoleColor foreground = ConsoleColor.White, ConsoleColor background = ConsoleColor.Black) {
             this.Character = nChar;
+            this.tempChar = nChar;
             this.ForeColor = foreground;
             this.BackColor = background;
         }
     }
+
 
 } // namespace

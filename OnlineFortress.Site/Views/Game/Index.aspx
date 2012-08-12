@@ -8,14 +8,25 @@
     <script type="text/javascript" src="../../Scripts/jquery.signalR-0.5.2.min.js"></script>
     <script type="text/javascript" src="signalr/hubs"></script>
     <script type="text/javascript" src="../../Scripts/benchmarker.js"></script>
+
     <script type="text/javascript">
         var ConnectionId = "";
 
-        var tilesize = 16;
+        var tileSet;
+        var tileSetWidth = 288;
+
+        var tileSize = 18;
         var height = 50;
         var width = 80;
 
         $(function () {
+            //var imageDimensions = { width: 18, height: 18 };
+            //var spriteSheet = new SpriteSheet('images/coins.png', imageDimensions);
+            //var firstImage = spriteSheet.get(0);
+
+            tileSet = document.getElementById("tileSet");
+//            tileSet.src = "images/ironhand_diagonal.png";
+
             $.connection.hub.logging = true;
 
             gameHub = $.connection.game;
@@ -40,20 +51,29 @@
                 var canvasFront = document.getElementById("gamefieldFront");
                 var ctxBack = canvasBack.getContext("2d");
                 var ctxFront = canvasFront.getContext("2d");
-                ctxFront.font = "16px mayday-no-highlight";
+                ctxFront.font = "18px mayday-no-highlight";
+                ctxFront.textAlign = "left";
                 ctxFront.textBaseline = "top";
                 console.log(screen);
 
                 for (y in screen) {
-                    var screeny = y * tilesize;
+                    var yCord = round(y * tileSize);
                     for (x in screen[y]) {
-                        ctxBack.clearRect(x * tilesize, screeny, tilesize, tilesize);
+                        var xCord = round(x * tileSize);
+                        ctxBack.clearRect(xCord, yCord, tileSize, tileSize);
                         ctxBack.fillStyle = colorNumerToHex(screen[y][x].BackColor);
-                        ctxBack.fillRect(x * tilesize, screeny, tilesize, tilesize);
+                        ctxBack.fillRect(xCord, yCord, tileSize, tileSize);
 
-                        ctxFront.clearRect(x * tilesize, screeny, tilesize, tilesize);
-                        ctxFront.fillStyle = colorNumerToHex(screen[y][x].ForeColor);
-                        ctxFront.fillText(screen[y][x].Character, x * tilesize, screeny);
+                        ctxFront.clearRect(xCord, yCord, tileSize, tileSize);
+
+                        var sprite = getSprite(screen[y][x].tempChar);
+                        if (sprite != null) {
+                            //ctxFront.drawImage(tileSet, xCord, yCord);
+                            ctxFront.drawImage(tileSet, sprite.x, sprite.y, tileSize, tileSize, xCord, yCord, tileSize, tileSize);
+                        } else {
+                            ctxFront.fillStyle = colorNumerToHex(screen[y][x].ForeColor);
+                            ctxFront.fillText(screen[y][x].Character, xCord, yCord);
+                        }
 
                     }
                 }
@@ -81,6 +101,22 @@
 
         function DrawFullScreen() {
             var screen = gameHub.drawFullScreen();
+        }
+        function floor(dbl) {
+            return ~~dbl;
+        }
+        function round(dbl) {
+            return (0.5 + dbl) | 0;
+        }
+
+        // Gets an sprites location on the sprite
+        function getSprite(index) {
+            if (index > 256) {
+                return null; //Chars beyond this fall of the tileset figure this out later
+            }
+            var tileY = floor(index / (tileSetWidth / tileSize));
+            var tileX = floor(index % (tileSetWidth / tileSize));
+            return { "x": tileX * tileSize, "y": tileY * tileSize };
         }
 
         // Convert an consoleColor to an html color;
@@ -143,8 +179,17 @@
             <canvas id="gamefieldBack" width="1280px" height="1024px" style="position: absolute; z-index: 9;"></canvas>
             <canvas id="gamefieldFront" width="1280px" height="1024px" style="position: absolute; z-index: 10;" ></canvas>
         </div>
-        
         <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <img id="tileSet" src="images/ironhand_diagonal.png" />
+        
     </div>
 </body>
 </html>
