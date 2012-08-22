@@ -94,6 +94,7 @@
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
     <Content Include="Images\ironhand_diagonal.png" />
+    <Content Include="Images\Phoebus_16x16_Diagonal.png" />
     <Content Include="Scripts\benchmarker.js" />
     <Content Include="Scripts\gamejs.min.js" />
     <Content Include="Scripts\jquery-1.6.4-vsdoc.js" />
