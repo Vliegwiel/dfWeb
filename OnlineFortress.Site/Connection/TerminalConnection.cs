@@ -16,8 +16,8 @@ namespace OnlineFortress.Site.Connection {
             if (_singleton == null) {
                 lock (_lock) {
                     if (_singleton == null) {
-                        //_singleton = new Terminal("localhost", 8000, 10, 80, 50); // hostname, port, timeout [s], width, height
-                        _singleton = new Terminal("faf.vliegwiel.org", 8000, 10, 80, 50); // hostname, port, timeout [s], width, height
+                        _singleton = new Terminal("localhost", 8000, 10, 80, 50); // hostname, port, timeout [s], width, height
+                        //_singleton = new Terminal("faf.vliegwiel.org", 8000, 10, 80, 50); // hostname, port, timeout [s], width, height
                         _singleton.Connect();
                     }
                 }

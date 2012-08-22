@@ -51,10 +51,10 @@
                 var canvasFront = document.getElementById("gamefieldFront");
                 var ctxBack = canvasBack.getContext("2d");
                 var ctxFront = canvasFront.getContext("2d");
-                ctxFront.font = "18px mayday-no-highlight";
+                ctxFront.font = "18px ironhand";
                 ctxFront.textAlign = "left";
                 ctxFront.textBaseline = "top";
-                console.log(screen);
+                //console.log(screen);
 
                 for (y in screen) {
                     var yCord = round(y * tileSize);
@@ -111,7 +111,12 @@
 
         // Gets an sprites location on the sprite
         function getSprite(index) {
-            if (index > 256) {
+           if (index > 256) {
+              switch (index) {
+                 case 9552:
+                    return getSprite(205);
+              }
+               console.log(index);
                 return null; //Chars beyond this fall of the tileset figure this out later
             }
             var tileY = floor(index / (tileSetWidth / tileSize));
@@ -176,8 +181,8 @@
     <div>
         <input type="button" onclick="DrawFullScreen();" title="update" value="update" /><input type="text" id="inp" /><br />
         <div id="gamegrid">
-            <canvas id="gamefieldBack" width="1280px" height="1024px" style="position: absolute; z-index: 9;"></canvas>
-            <canvas id="gamefieldFront" width="1280px" height="1024px" style="position: absolute; z-index: 10;" ></canvas>
+            <canvas id="gamefieldBack" width="1440px" height="1024px" style="position: absolute; z-index: 9;"></canvas>
+            <canvas id="gamefieldFront" width="1440" height="1024px" style="position: absolute; z-index: 10;" ></canvas>
         </div>
         <br />
         <br />

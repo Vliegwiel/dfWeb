@@ -1,0 +1,52 @@
+﻿keysequence_keymappings["\x1b\x5b\x41"] = AUp;
+keysequence_keymappings["\x1b\x5b\x42"] = ADown;
+keysequence_keymappings["\x1b\x5b\x43"] = ARight;
+keysequence_keymappings["\x1b\x5b\x44"] = ALeft;
+keysequence_keymappings["\x1b\x4f\x41"] = CtrlUp;
+keysequence_keymappings["\x1b\x4f\x42"] = CtrlDown;
+keysequence_keymappings["\x1b\x4f\x43"] = CtrlRight;
+keysequence_keymappings["\x1b\x4f\x44"] = CtrlLeft;
+
+keysequence_keymappings["\x1b\x5b\x31\x31\x7e"] = F1;
+keysequence_keymappings["\x1b\x5b\x31\x32\x7e"] = F2;
+keysequence_keymappings["\x1b\x5b\x31\x33\x7e"] = F3;
+keysequence_keymappings["\x1b\x5b\x31\x34\x7e"] = F4;
+keysequence_keymappings["\x1b\x5b\x31\x35\x7e"] = F5;
+keysequence_keymappings["\x1b\x5b\x31\x37\x7e"] = F6;
+keysequence_keymappings["\x1b\x5b\x31\x38\x7e"] = F7;
+keysequence_keymappings["\x1b\x5b\x31\x39\x7e"] = F8;
+keysequence_keymappings["\x1b\x5b\x32\x30\x7e"] = F9;
+keysequence_keymappings["\x1b\x5b\x32\x31\x7e"] = F10;
+keysequence_keymappings["\x1b\x5b\x32\x32\x7e"] = F11;
+keysequence_keymappings["\x1b\x5b\x32\x33\x7e"] = F12;
+
+keysequence_keymappings["\x1b\x5b\x31\x7e"] = Home;
+keysequence_keymappings["\x1b\x5b\x32\x7e"] = InsertChar;
+
+keysequence_keymappings["\x1b\x5b\x33\x7e"] = DeleteChar;
+
+keysequence_keymappings["\x1b\x5b\x34\x7e"] = End;
+keysequence_keymappings["\x1b\x5b\x36\x7e"] = PgDown;   // pgdown
+keysequence_keymappings["\x1b\x5b\x35\x7e"] = PgUp;  // pgup
+
+/* Konsole sends these */
+keysequence_keymappings["\x1b[1;3A"] = AltUp; 
+keysequence_keymappings["\x1b[1;3B"] = AltDown;   /* The 3 denotes alt key. */
+keysequence_keymappings["\x1b[1;3C"] = AltRight;  /* 5 is ctrl key and 7 is */
+keysequence_keymappings["\x1b[1;3D"] = AltLeft;   /* alt and ctrl at the same time */
+keysequence_keymappings["\x1b[1;5A"] = CtrlUp;
+keysequence_keymappings["\x1b[1;5B"] = CtrlDown;
+keysequence_keymappings["\x1b[1;5C"] = CtrlRight;
+keysequence_keymappings["\x1b[1;5D"] = CtrlLeft;
+keysequence_keymappings["\x1b[1;7A"] = AltUp;
+keysequence_keymappings["\x1b[1;7B"] = AltDown;
+keysequence_keymappings["\x1b[1;7C"] = AltRight;
+keysequence_keymappings["\x1b[1;7D"] = AltLeft;
+
+keysequence_keymappings["\x1b\x4fP"] = F1;
+keysequence_keymappings["\x1b\x4fQ"] = F2;
+keysequence_keymappings["\x1b\x4fR"] = F3;
+keysequence_keymappings["\x1b\x4fS"] = F4;
+
+keysequence_keymappings["\x1b\x5b" "F"] = End;
+keysequence_keymappings["\x1b\x5b" "H"] = Home;

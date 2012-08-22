@@ -211,8 +211,8 @@ namespace OnlineFortress.TelnetClient {
 		}
 
 		// screen array [x,y]
-		private ConsoleChar[,] vs = null;
-        private ConsoleChar[,] vsupdated = null;
+		private Tile[,] vs = null;
+        private Tile[,] vsupdated = null;
 		// cache for screen as string
 		string screenString = null;
 		string screenStringLower = null;
@@ -260,8 +260,8 @@ namespace OnlineFortress.TelnetClient {
 		{
 			this.offsetx = xOffset;
 			this.offsety = yOffset;
-			this.vs = new ConsoleChar[width,height];
-            this.vsupdated = new ConsoleChar[width, height];
+			this.vs = new Tile[width,height];
+            this.vsupdated = new Tile[width, height];
 			this.CleanScreen();
 			this.changedScreen = false; // reset becuase constructor
 			this.visibleAreaY0top = 0;
@@ -283,7 +283,7 @@ namespace OnlineFortress.TelnetClient {
 			{
 				for (int x=0; x < lx; x++) 
 				{
-					this.vs[x,y] = new ConsoleChar(SPACE);
+					this.vs[x,y] = new Tile(SPACE);
 				}
 			}
 			this.CursorReset(); // cursor back to beginning
@@ -330,7 +330,7 @@ namespace OnlineFortress.TelnetClient {
 			{
 				for (int x=x0start; x <=x0end; x++) 
 				{
-					this.vs[x,y] = new ConsoleChar(SPACE);
+					this.vs[x,y] = new Tile(SPACE);
 				}
 			}
 			this.changedScreen = true;
@@ -363,7 +363,7 @@ namespace OnlineFortress.TelnetClient {
 
 			for (int x=x0s; x <=x0e; x++) 
 			{
-				this.vs[x,y] = new ConsoleChar(SPACE);
+				this.vs[x,y] = new Tile(SPACE);
 			}
 			this.changedScreen = true;
 		}
@@ -450,7 +450,7 @@ namespace OnlineFortress.TelnetClient {
 		/// </remarks>
 		/// <param name="writeChar">Output bytes</param>
 		/// <returns>True if byte has been written</returns>
-		public bool WriteCharacters(ConsoleChar[] writeChar) 
+		public bool WriteCharacters(Tile[] writeChar) 
 		{
 			if (writeChar==null || writeChar.Length < 1)
 				return false;
@@ -474,7 +474,7 @@ namespace OnlineFortress.TelnetClient {
 		/// <param name="writeChar">Output byte</param>
 		/// <param name="moveCursor">Move the cursor or not</param>
 		/// <returns>True if byte has been written</returns>
-		public bool WriteCharacter(ConsoleChar writeChar, bool moveCursor = true) {
+		public bool WriteCharacter(Tile writeChar, bool moveCursor = true) {
             if (vs == null) {
                 return false;
             }  else {
@@ -536,9 +536,9 @@ namespace OnlineFortress.TelnetClient {
 			if (s==null) return false;
 
             var a = from char c in s.ToCharArray()
-                    select new ConsoleChar(c, Foreground, Background);
+                    select new Tile(c, Foreground, Background);
 
-            return this.WriteCharacters(a.ToArray<ConsoleChar>());
+            return this.WriteCharacters(a.ToArray<Tile>());
 		}
 
 		/// <summary>
@@ -703,15 +703,15 @@ namespace OnlineFortress.TelnetClient {
 			return this.GetType().FullName + " " + this.Width + " | " + this.Height + " | changed " + this.changedScreen;
 		}
 
-        public ConsoleChar[,] GetCurrentScreen() {
+        public Tile[,] GetCurrentScreen() {
             this.changedScreen = false;
             return this.vs;
         }
 
-        public ConsoleChar[,] GetScreenUpdate() {
+        public Tile[,] GetScreenUpdate() {
             this.changedScreen = false;
-            ConsoleChar[,] ret = (ConsoleChar[,])this.vsupdated.Clone();
-            this.vsupdated = new ConsoleChar[Width,Height]; 
+            Tile[,] ret = (Tile[,])this.vsupdated.Clone();
+            this.vsupdated = new Tile[Width,Height]; 
             return ret;
         }
 
@@ -850,22 +850,4 @@ namespace OnlineFortress.TelnetClient {
 				return null;
 		} // find regular expression
 	} // class
-
-
-    public partial class ConsoleChar {
-
-        public char Character;
-        public int tempChar;
-        public ConsoleColor ForeColor;
-        public ConsoleColor BackColor;
-
-        public ConsoleChar(char nChar, ConsoleColor foreground = ConsoleColor.White, ConsoleColor background = ConsoleColor.Black) {
-            this.Character = nChar;
-            this.tempChar = nChar;
-            this.ForeColor = foreground;
-            this.BackColor = background;
-        }
-    }
-
-
 } // namespace

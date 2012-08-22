@@ -172,7 +172,7 @@ namespace OnlineFortress.TelnetClient {
         private bool firstResponse = true;
 
         // some constants
-        const int RECEIVEBUFFERSIZE = 10 * 1024; // read a lot
+        const int RECEIVEBUFFERSIZE = 20 * 1024; // read a lot
         const int SENDBUFFERSIZE = 25; // only small reponses -> only for DOs, WILLs, not for user's responses
         const byte ESC = 27;
         const byte CR = 13;
@@ -749,10 +749,10 @@ namespace OnlineFortress.TelnetClient {
                             bc = this.ParseEscSequence(bc, response);
                             break;
                         case CR:
-                            this.virtualScreen.WriteCharacter(new ConsoleChar((char)CR));
+                            this.virtualScreen.WriteCharacter(new Tile((char)CR));
                             break;
                         case LF:
-                            this.virtualScreen.WriteCharacter(new ConsoleChar((char)LF));
+                            this.virtualScreen.WriteCharacter(new Tile((char)LF));
                             break;
                         // DO
                         case TNC_IAC:

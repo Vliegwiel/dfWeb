@@ -38,15 +38,15 @@ namespace OnlineFortress.Console {
             do {
                 if (tn.GetScreenSafe().ChangedScreen) {
 
-                    ConsoleChar[,] Screen = tn.GetScreenSafe().GetScreenUpdate();
+                    Tile[,] Screen = tn.GetScreenSafe().GetScreenUpdate();
 
                     for (int y = 0; y < Screen.GetLength(1); y++) {
                         for (int x = 0; x < Screen.GetLength(0); x++) {
-                            ConsoleChar point = Screen[x, y];
+                            Tile point = Screen[x, y];
 
                             if (point != null) {
                                 if (point.Character == 8729) {
-                                    point = new ConsoleChar((char)1, ConsoleColor.Black, ConsoleColor.Green);
+                                    point = new Tile((char)1, ConsoleColor.Black, ConsoleColor.Green);
                                 }
                                 ConsoleEx.QPrint(point.Character.ToString(), x, y, ConvertColor(point.ForeColor), ConvertColor(point.BackColor));
                             }

@@ -49,11 +49,11 @@ namespace OnlineFortress.Site.Hubs {
         public void DrawFullScreen() {
             Terminal tn = TerminalConnection.GetSingleton();
             
-            var matrix = new Dictionary<int, Dictionary<int, ConsoleChar>>();
+            var matrix = new Dictionary<int, Dictionary<int, Tile>>();
             var screen = tn.GetScreenSafe().GetCurrentScreen();
 
             for (int y = 0; y < screen.GetLength(1); y++) {
-                var xaxis = new Dictionary<int, ConsoleChar>();
+                var xaxis = new Dictionary<int, Tile>();
                 for (int x = 0; x < screen.GetLength(0); x++) {
                     //ConsoleChar point = Screen[x, y];
                     if (screen[x, y] != null) {
@@ -80,11 +80,11 @@ namespace OnlineFortress.Site.Hubs {
                 var startTicks = Environment.TickCount;
                 
                 if (tn.HasUpdate()) {
-                    var matrix = new Dictionary<int, Dictionary<int, ConsoleChar>>();
+                    var matrix = new Dictionary<int, Dictionary<int, Tile>>();
                     var Screen = tn.GetScreenSafe().GetScreenUpdate();
 
                     for (int y = 0; y < Screen.GetLength(1); y++) {
-                        var xaxis = new Dictionary<int, ConsoleChar>();
+                        var xaxis = new Dictionary<int, Tile>();
                         for (int x = 0; x < Screen.GetLength(0); x++) {
                             //ConsoleChar point = Screen[x, y];
                             if (Screen[x, y] != null) {
@@ -99,7 +99,7 @@ namespace OnlineFortress.Site.Hubs {
 
                 int timeTicksLeft = (startTicks + ticksPerFrame) - Environment.TickCount;
                 if (timeTicksLeft > 0) {
-                    System.Diagnostics.Debug.WriteLine("{2} Sec {0} sleeping {1}ms", DateTime.Now.Second, timeTicksLeft, Thread.CurrentThread.ManagedThreadId);
+                    //System.Diagnostics.Debug.WriteLine("{2} Sec {0} sleeping {1}ms", DateTime.Now.Second, timeTicksLeft, Thread.CurrentThread.ManagedThreadId);
                     Thread.Sleep(timeTicksLeft);
                 }
 
