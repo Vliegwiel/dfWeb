@@ -13,9 +13,9 @@
         var ConnectionId = "";
 
         var tileSet;
-        var tileSetWidth = 288;
+        var tileSetWidth = 256;
 
-        var tileSize = 18;
+        var tileSize = 16;
         var height = 50;
         var width = 80;
 
@@ -193,7 +193,7 @@
         <br />
         <br />
         <br />
-        <img id="tileSet" src="images/ironhand_diagonal.png" />
+        <img id="tileSet" src="images/Phoebus_16x16_Diagonal.png" />
         
     </div>
 </body>
