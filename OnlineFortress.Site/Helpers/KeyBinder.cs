@@ -22,6 +22,9 @@ namespace OnlineFortress.Site.Helpers {
             switch (character) {
                 case 0:
                     switch (keycode) {
+                        case 27:
+                            // Esc
+                            return new byte[] { 27 };
                         case 33:
                             // Page Up esc[F
                             //return new byte[] { 27, 91 };
@@ -54,9 +57,11 @@ namespace OnlineFortress.Site.Helpers {
                     // Needed for up down keys etc
                     break;
                 case 8:
+                    // Backspace
                     return new byte[] { 127 };
             }
 
+            // Alt prefixes an ESC before the character
             if (hasAlt) {
                 ret[i] = ESC;
                 i++;
@@ -66,15 +71,12 @@ namespace OnlineFortress.Site.Helpers {
             if (hasCtrl) {
                 if ((int)character > CtrlLowerCaseOffset) {
                     ret[i] = (byte)((int)character - (int)CtrlLowerCaseOffset);
-                    i++;
                 } else {
                     ret[i] = (byte)((int)character - (int)CtrlUpperCaseOffset);
-                    i++;
-                }                
-                return ret;
+                }
+            } else {
+                ret[i] = character;
             }
-
-            ret[i] = character;
 
             return ret;
         }   
