@@ -18,7 +18,7 @@ namespace OnlineFortress.Site.Hubs {
     public class Game : Hub, IConnected, IDisconnect {
 
         private static int _gameLoopRunning;
-        private const int FPSLIMIT = 4;
+        private const int FPSLIMIT = 24;
 
         public Task Connect() {
 

@@ -21,17 +21,11 @@
         var width = 80;
 
         $(function () {
-           //var imageDimensions = { width: 18, height: 18 };
-           //var spriteSheet = new SpriteSheet('images/coins.png', imageDimensions);
-           //var firstImage = spriteSheet.get(0);
-
            tileSet = document.getElementById("tileSet");
-           //            tileSet.src = "images/ironhand_diagonal.png";
 
            $.connection.hub.logging = true;
 
            gameHub = $.connection.game;
-           //myHub.someState = "SomeValue";
 
            $.connection.hub.error(function () {
               alert("An error occured");
@@ -45,14 +39,13 @@
               $('#messages').append('<li>' + message + '');
            };
            gameHub.ScreenUpdate = function (screen) {
-              //BackColor                0
-              //Character                "╔"
-              //ForeColor                9
               var canvasBack = document.getElementById("gamefieldBack");
               var canvasFront = document.getElementById("gamefieldFront");
               var ctxBack = canvasBack.getContext("2d");
               var ctxFront = canvasFront.getContext("2d");
-              ctxFront.globalAlpha = 0.1;
+              ctxBack.globalAlpha = 0.7;
+              ctxFront.globalAlpha = 0.2;
+
               console.log(screen);
 
               for (y in screen) {
