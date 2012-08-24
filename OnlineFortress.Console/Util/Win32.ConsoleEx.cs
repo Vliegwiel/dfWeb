@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.VisualBasic;
-using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
+
 using System.Data;
 using System.Diagnostics;
-using System.Text;
 using System.Runtime.InteropServices;
 
 namespace Win32 {

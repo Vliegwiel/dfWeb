@@ -1,9 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Win32;
-
 using OnlineFortress.TelnetClient;
 
 namespace OnlineFortress.Console {
@@ -75,8 +73,6 @@ namespace OnlineFortress.Console {
                     tn.SendResponse(GetKeyPressBytes(name), false);
                 }
             }
-
-            tn.Close();
         }
 
         private static string GetKeyPressBytes(ConsoleKeyInfo keypress) {
