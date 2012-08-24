@@ -1,4 +1,5 @@
-﻿<%@ Page Language="C#" Inherits="System.Web.Mvc.ViewPage<dynamic>" %>
+﻿
+<%@ Page Language="C#" Inherits="System.Web.Mvc.ViewPage<dynamic>" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -51,9 +52,6 @@
                 var canvasFront = document.getElementById("gamefieldFront");
                 var ctxBack = canvasBack.getContext("2d");
                 var ctxFront = canvasFront.getContext("2d");
-                ctxFront.font = "18px ironhand";
-                ctxFront.textAlign = "left";
-                ctxFront.textBaseline = "top";
                 //console.log(screen);
 
                 for (y in screen) {
@@ -70,9 +68,6 @@
                         if (sprite != null) {
                             //ctxFront.drawImage(tileSet, xCord, yCord);
                             ctxFront.drawImage(tileSet, sprite.x, sprite.y, tileSize, tileSize, xCord, yCord, tileSize, tileSize);
-                        } else {
-                            ctxFront.fillStyle = colorNumerToHex(screen[y][x].ForeColor);
-                            ctxFront.fillText(screen[y][x].Character, xCord, yCord);
                         }
 
                     }
@@ -181,8 +176,8 @@
     <div>
         <input type="button" onclick="DrawFullScreen();" title="update" value="update" /><input type="text" id="inp" /><br />
         <div id="gamegrid">
-            <canvas id="gamefieldBack" width="1440px" height="1024px" style="position: absolute; z-index: 9;"></canvas>
-            <canvas id="gamefieldFront" width="1440" height="1024px" style="position: absolute; z-index: 10;" ></canvas>
+            <canvas id="gamefieldBack" width="1440px" height="1280px" style="position: absolute; z-index: 10;"></canvas>
+            <canvas id="gamefieldFront" width="1440px" height="12804px" style="position: absolute; z-index: 9;" ></canvas>
         </div>
         <br />
         <br />
@@ -193,7 +188,7 @@
         <br />
         <br />
         <br />
-        <img id="tileSet" src="images/Phoebus_16x16_Diagonal.png" />
+        <img id="tileSet" src="images/Phoebus_16x16_Diagonal.png" style="display: none;" />
         
     </div>
 </body>
