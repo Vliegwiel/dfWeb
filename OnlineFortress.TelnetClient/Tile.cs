@@ -10,7 +10,7 @@ namespace OnlineFortress.TelnetClient {
         public ConsoleColor ForeColor;
         public ConsoleColor BackColor;
 
-        public Tile(char nChar, ConsoleColor foreground = ConsoleColor.White, ConsoleColor background = ConsoleColor.Black) {
+        public Tile(char nChar, ConsoleColor foreground = ConsoleColor.Black, ConsoleColor background = ConsoleColor.Black) {
             this.Character = nChar;
             
             if (_KeyValuePair.ContainsKey(nChar)) {

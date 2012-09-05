@@ -12,77 +12,80 @@
 
     <script type="text/javascript">
         var ConnectionId = "";
+        var debug;
 
         var tileSet;
+        var white;
         var tileSetWidth = 256;
 
         var tileSize = 16;
         var height = 50;
         var width = 80;
 
+        var tilecache = new Array(16);
+
         $(function () {
-           tileSet = document.getElementById("tileSet");
+            tileSet = document.getElementById("tileSet");
+            white = document.getElementById("white");
 
-           $.connection.hub.logging = true;
+            $.connection.hub.logging = true;
 
-           gameHub = $.connection.game;
+            gameHub = $.connection.game;
 
-           $.connection.hub.error(function () {
-              alert("An error occured");
-           });
+            $.connection.hub.error(function () {
+                alert("An error occured");
+            });
 
-           gameHub.connectCallback = function (connectionId) {
-              this.ConnectionId = connectionId
-           }
-           gameHub.addMessage = function (message) {
-              alert(message);
-              $('#messages').append('<li>' + message + '');
-           };
-           gameHub.ScreenUpdate = function (screen) {
-              var canvasBack = document.getElementById("gamefieldBack");
-              var canvasFront = document.getElementById("gamefieldFront");
-              var ctxBack = canvasBack.getContext("2d");
-              var ctxFront = canvasFront.getContext("2d");
-              ctxBack.globalAlpha = 0.7;
-              ctxFront.globalAlpha = 0.2;
+            gameHub.connectCallback = function (connectionId) {
+                this.ConnectionId = connectionId
+            }
+            gameHub.addMessage = function (message) {
+                alert(message);
+                $('#messages').append('<li>' + message + '');
+            };
+            gameHub.ScreenUpdate = function (screen) {
+                var canvasBack = document.getElementById("gamefieldBack");
+                var canvasFront = document.getElementById("gamefieldFront");
+                var ctxBack = canvasBack.getContext("2d");
+                var ctxFront = canvasFront.getContext("2d");
 
-              console.log(screen);
+                if (debug) {
+                    console.log(screen);
+                }
+                if (tilecache.length < 16) {
+                    return
+                }
+                for (y in screen) {
+                    var yCord = round(y * tileSize);
+                    for (x in screen[y]) {
+                        var xCord = round(x * tileSize);
+                        //ctxBack.clearRect(xCord, yCord, tileSize, tileSize);
+                        ctxFront.fillStyle = colorNumerToHex(screen[y][x].BackColor);
+                        ctxFront.fillRect(xCord, yCord, tileSize, tileSize);
 
-              for (y in screen) {
-                 var yCord = round(y * tileSize);
-                 for (x in screen[y]) {
-                    var xCord = round(x * tileSize);
-                    ctxBack.clearRect(xCord, yCord, tileSize, tileSize);
-                    ctxBack.fillStyle = colorNumerToHex(screen[y][x].BackColor);
-                    ctxBack.fillRect(xCord, yCord, tileSize, tileSize);
+                        ctxFront.clearRect(xCord, yCord, tileSize, tileSize);
+                        var r = screen[y][x].ForeColor
+                        var q = screen[y][x].tempChar;
 
-                    ctxFront.clearRect(xCord, yCord, tileSize, tileSize);
-
-                    var sprite = getSprite(screen[y][x].tempChar);
-                    if (sprite != null) {
-                       ctxBack.drawImage(tileSet, sprite.x, sprite.y, tileSize, tileSize, xCord, yCord, tileSize, tileSize);
-
-                       ctxFront.fillStyle = colorNumerToHex(screen[y][x].ForeColor);
-                       ctxFront.fillRect(xCord, yCord, tileSize, tileSize);
+                        ctxFront.putImageData(tilecache[r][q], xCord, yCord);
                     }
+                }
 
-                 }
-              }
+            }
+            console.log("test");
+            $.connection.hub.start();
 
-           }
-
-           $.connection.hub.start();
-
-           // Setup keybinding
-           var xTriggered = 0;
-           $("#inp").keypress(function (event) {
-              //if (event.which != 0) {
-              //allow for f5 to function !? 
-              event.preventDefault();
-              //}
-              console.log(event.which + " || " + event.keyCode);
-              gameHub.sendKey(event.which, event.keyCode, event.altKey, event.ctrlKey, event.shiftKey);
-           });
+            // Setup keybinding
+            $("#inp").keypress(function (event) {
+                //if (event.which != 0) {
+                //allow for f5 to function !? 
+                event.preventDefault();
+                //}
+                console.log(event.which + " || " + event.keyCode);
+                gameHub.sendKey(event.which, event.keyCode, event.altKey, event.ctrlKey, event.shiftKey);
+            });
+            console.log("test");
+            setTimeout('loadColor(0)', 200);
 
         });
 
@@ -150,6 +153,101 @@
             return "FF0099";
         }
 
+        function loadColor(color) {
+            var canvasBack = document.getElementById("gamefieldBack");
+            var canvasFront = document.getElementById("gamefieldFront");
+            var ctxBack = canvasBack.getContext("2d");
+            var ctxFront = canvasFront.getContext("2d");
+
+            console.log('loadColor(' + color + ')');
+            var set = toRgbaFromAlphaChannel(white, tileSet)
+
+            ctxFront.clearRect(0, 0, set.width, set.height);
+
+            ctxFront.fillStyle = colorNumerToHex(color);
+            ctxFront.fillRect(0, 0, set.width, set.height);
+            //ctxFront.drawImage(white, 0, 0);
+            ctxFront.globalCompositeOperation = 'xor';
+            ctxFront.drawImage(set, 0, 0);
+
+            tilecache[color] = new Array(256);
+            var i = 0
+            for (y = 0; y < 16; y++) {
+                var yCord = round(y * tileSize);
+                    
+                for (x = 0; x < 16; x++) {
+                    var xCord = round(x * tileSize);
+                    tilecache[color][i++] = ctxFront.getImageData(xCord, yCord, 16, 16);
+                } // For x
+            } // For y
+
+            if ((color < 16) && (color >= 0)) {
+                setTimeout('loadColor(' + (color + 1) + ')', 1);
+            } else if(color === 16) {
+                $.connection.hub.start();
+            }
+
+        }
+
+
+
+        var toRgbaFromAlphaChannel = function (rgbImage, alphaChannelImage) {
+            var width = alphaChannelImage.width;
+            var height = alphaChannelImage.height;
+
+            return renderToCanvas(width, height, function (ctx) {
+                var alpha = renderToCanvas(width, height, function (ctx) {
+                    var id, data, i;
+                    ctx.drawImage(alphaChannelImage, 0, 0);
+                    id = ctx.getImageData(0, 0, width, height);
+                    data = id.data;
+
+                    for (i = data.length - 1; i > 0; i -= 4) {
+                        var R = data[i - 3];
+                        var G = data[i - 2];
+                        var B = data[i - 1];
+                        var A = data[i];
+
+                        if (A === 255) {
+                            // if no transpiracy check for grayness, grayscales get inverted for the xor
+                            if ((R == G) && (G == B)) {
+                                data[i] = 255 - data[i - 3];
+                                data[i - 3] = 0;
+                                data[i - 2] = 0;
+                                data[i - 1] = 0;
+                            }
+                            data[i - 3] = 0;
+                            data[i - 2] = 0;
+                            data[i - 1] = 0;
+                        } else {
+                            // Pixel has an alpha value, invert that for the xor
+                            data[i] = 255 - data[i];
+                            data[i - 3] = 0;
+                            data[i - 2] = 0;
+                            data[i - 1] = 0;
+                        }
+
+                    }
+                    ctx.clearRect(0, 0, width, height);
+                    ctx.putImageData(id, 0, 0);
+                });
+
+                //ctx.globalCompositeOperation = 'source-over';
+                //ctx.drawImage(rgbImage, 0, 0);
+                //ctx.globalCompositeOperation = 'xor';
+                ctx.drawImage(alpha, 0, 0);
+
+            });
+        };
+
+        var renderToCanvas = function (width, height, renderFunction) {
+            var buffer = document.getElementById("buffer");
+            buffer.width = width;
+            buffer.height = height;
+            renderFunction(buffer.getContext('2d'));
+            return buffer;
+        };
+
     </script>
     <style type="text/css" media="all">
         * {
@@ -160,19 +258,23 @@
             clear: both;
         }
         body {
-            background-color: #000;
+            background: #000;
         }
     </style>
 </head>
 <body>
     <div>
-        <input type="button" onclick="DrawFullScreen();" title="update" value="update" /><input type="text" id="inp" /><br />
+        <input type="button" onclick="DrawFullScreen();" title="update" value="update" />
+        <input type="text" id="inp" />
+        <input type="button" onclick="debug = true;" title="debug" value="debug" /><br />
+        
         <div id="gamegrid">
-            <canvas id="gamefieldBack" width="1440px" height="1280px" style="position: absolute; z-index: 9;"></canvas>
-            <canvas id="gamefieldFront" width="1440px" height="12804px" style="position: absolute; z-index: 10;" ></canvas>
+            <canvas id="gamefieldBack" width="1440px" height="1280px" style="position: absolute; z-index: 9; display:none;"></canvas>
+            <canvas id="gamefieldFront" width="1440px" height="1280px" style="position: absolute; z-index: 10;" ></canvas>
         </div>
         <br />
         <br />
+            <canvas id="buffer" width="1440px" height="1280px" style="position: absolute; z-index: 9; display:none;"></canvas>
         <br />
         <br />
         <br />
@@ -180,8 +282,7 @@
         <br />
         <br />
         <br />
-        <img id="tileSet" src="images/Phoebus_16x16_Diagonal.png" style="display: none;" />
-        
+        <img id="tileSet" src="images/Phoebus_16x16_Diagonal.png" style="display:none;" />
     </div>
 </body>
 </html>
