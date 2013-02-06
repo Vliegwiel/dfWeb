@@ -70,12 +70,12 @@ namespace OnlineFortress.Console {
                         tn.SendResponseFunctionKey(fkey);
                     }
 
-                    tn.SendResponse(GetKeyPressBytes(name), false);
+                    tn.SendResponse(this.GetKeyPressBytes(name), false);
                 }
             }
         }
 
-        private static string GetKeyPressBytes(ConsoleKeyInfo keypress) {
+        private string GetKeyPressBytes(ConsoleKeyInfo keypress) {
             string ret = "";
             const byte ESC = 27;
 
@@ -122,6 +122,10 @@ namespace OnlineFortress.Console {
                 ret += Convert.ToChar(ESC);
             }
             if (keypress.Modifiers == ConsoleModifiers.Control) {
+                if (keypress.Key == ConsoleKey.D) {
+                    tn.ToggleDebug();
+                    return null;
+                }
                 ret += Convert.ToChar(ESC);
                 return ret += keypress.KeyChar;
             }

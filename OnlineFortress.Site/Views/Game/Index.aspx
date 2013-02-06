@@ -15,18 +15,18 @@
         var debug;
 
         var tileSet;
-        var white;
         var tileSetWidth = 256;
 
         var tileSize = 16;
         var height = 50;
         var width = 80;
 
+        var bTileCacheLoaded = false;
+        var alphamask;
         var tilecache = new Array(16);
 
         $(function () {
             tileSet = document.getElementById("tileSet");
-            white = document.getElementById("white");
 
             $.connection.hub.logging = true;
 
@@ -52,7 +52,7 @@
                 if (debug) {
                     console.log(screen);
                 }
-                if (tilecache.length < 16) {
+                if (!bTileCacheLoaded) {
                     return
                 }
                 for (y in screen) {
@@ -85,7 +85,7 @@
                 gameHub.sendKey(event.which, event.keyCode, event.altKey, event.ctrlKey, event.shiftKey);
             });
             console.log("test");
-            setTimeout('loadColor(0)', 200);
+            setTimeout('loadColor(0)', 100);
 
         });
 
@@ -120,37 +120,67 @@
                 case 0:
                     return "#000000";
                 case 1:
-                    return "#0000BB";
+                    //[BLUE_R:46][BLUE_G:88][BLUE_B:255]
+                    //return "#0000BB";
+                    return "#2E58FF";
                 case 2:
-                    return "#00BB00";
+                    //[GREEN_R:70][GREEN_G:170][GREEN_B:56]
+                    return "#46AA38";
+                    //return "#00BB00";
                 case 3:
-                    return "#00BBBB";
+                    //[CYAN_R:56][CYAN_G:136][CYAN_B:170]
+                    return "#3888AA";
+                    //return "#00BBBB";
                 case 4:
-                    return "#BB0000";
+                    //[RED_R:170]
+                    return "#AA0000";
+                    //return "#BB0000";
                 case 5:
-                    return "#BB00BB";
+                    //[MAGENTA_R:170][MAGENTA_G:56][MAGENTA_B:136]
+                    return "#AA3888";
+                    //return "#BB00BB";
                 case 6:
-                    return "#BBBB00";        
+                    //[BROWN_R:170][BROWN_G:85][BROWN_B:28]
+                    return "#AA551C";
+                    //return "#BBBB00";
                 case 7:
-                    return "#BBBBBB";
+                    //[LGRAY_R:187][LGRAY_G:177][LGRAY_B:167]
+                    return "#BBB1A7";
+                    //return "#BBBBBB";
                 case 8:
-                    return "#555555";
+                    //[DGRAY_R:135][DGRAY_G:125][DGRAY_B:115]
+                    return "#877D73";
+                    //return "#555555";
                 case 9:
-                    return "#5555FF";
+                    //[LBLUE_R:96][LBLUE_G:128][LBLUE_B:255]
+                    return "#6080E1";
+                    //return "#5555FF";
                 case 10:
-                    return "#55FF55";
+                    //[LGREEN_R:105][LGREEN_G:255][LGREEN_B:84]
+                    return "#69FF54";
+                    //return "#55FF55";
                 case 11:
-                    return "#55FFFF";
+                    //[LCYAN_R:84][LCYAN_G:212][LCYAN_B:255]
+                    return "#54D4FF";
+                    //return "#55FFFF";
                 case 12:
-                    return "#FF5555";
+                    //[LRED_R:255]
+                    return "#FF0000";
+                    //return "#FF5555";
                 case 13:
-                    return "#FF55FF";
+                    //[LMAGENTA_R:255][LMAGENTA_G:84][LMAGENTA_B:212]
+                    return "#FF54D4";
+                    //return "#FF55FF";
                 case 14:
-                    return "#FFFF55";
+                    //[YELLOW_R:255][YELLOW_G:204]
+                    return "#FFCC00";
+                    //return "#FFFF55";
                 case 15:
-                    return "#FFFFFF";
+                    //[WHITE_R:255][WHITE_G:250][WHITE_B:245]
+                    return "#FFFAF5";
+                    //return "#FFFFFF";
             }
-            return "FF0099";
+            return "FF0099"; // Error color magicpink
         }
 
         function loadColor(color) {
@@ -160,15 +190,17 @@
             var ctxFront = canvasFront.getContext("2d");
 
             console.log('loadColor(' + color + ')');
-            var set = toRgbaFromAlphaChannel(white, tileSet)
+            if (alphamask == null) {
+                console.log("Loading alphamask");
+                alphamask = toRgbaFromAlphaChannel(tileSet)
+            }
 
-            ctxFront.clearRect(0, 0, set.width, set.height);
+            ctxFront.clearRect(0, 0, alphamask.width, alphamask.height);
 
             ctxFront.fillStyle = colorNumerToHex(color);
-            ctxFront.fillRect(0, 0, set.width, set.height);
-            //ctxFront.drawImage(white, 0, 0);
+            ctxFront.fillRect(0, 0, alphamask.width, alphamask.height);
             ctxFront.globalCompositeOperation = 'xor';
-            ctxFront.drawImage(set, 0, 0);
+            ctxFront.drawImage(alphamask, 0, 0);
 
             tilecache[color] = new Array(256);
             var i = 0
@@ -183,7 +215,8 @@
 
             if ((color < 16) && (color >= 0)) {
                 setTimeout('loadColor(' + (color + 1) + ')', 1);
-            } else if(color === 16) {
+            } else if (color === 16) {
+                bTileCacheLoaded = true;
                 $.connection.hub.start();
             }
 
@@ -191,7 +224,7 @@
 
 
 
-        var toRgbaFromAlphaChannel = function (rgbImage, alphaChannelImage) {
+        var toRgbaFromAlphaChannel = function (alphaChannelImage) {
             var width = alphaChannelImage.width;
             var height = alphaChannelImage.height;
 
@@ -202,41 +235,38 @@
                     id = ctx.getImageData(0, 0, width, height);
                     data = id.data;
 
+                    //  loop trough each pixel
                     for (i = data.length - 1; i > 0; i -= 4) {
                         var R = data[i - 3];
                         var G = data[i - 2];
                         var B = data[i - 1];
                         var A = data[i];
 
-                        if (A === 255) {
-                            // if no transpiracy check for grayness, grayscales get inverted for the xor
-                            if ((R == G) && (G == B)) {
-                                data[i] = 255 - data[i - 3];
+                        if (true) {
+                            // base foreground transpiracy on the color of grayness of everything that has a highalpha
+                            var rgbMax = Math.max(R, G, B);
+                            var rgbMin = Math.min(R, G, B);
+
+                            // allow for a variance of 1 in the grayscale, since that happens on the tilesheets
+                            if ((rgbMax - rgbMin) <= 1) {
+                                data[i] = 255 - R;
+                                data[i - 3] = 0;
+                                data[i - 2] = 0;
+                                data[i - 1] = 0;
+                            } else {
+                                // remove nongrayscale pixels from the transpiracy sheet
+                                data[i] = 255;
                                 data[i - 3] = 0;
                                 data[i - 2] = 0;
                                 data[i - 1] = 0;
                             }
-                            data[i - 3] = 0;
-                            data[i - 2] = 0;
-                            data[i - 1] = 0;
-                        } else {
-                            // Pixel has an alpha value, invert that for the xor
-                            data[i] = 255 - data[i];
-                            data[i - 3] = 0;
-                            data[i - 2] = 0;
-                            data[i - 1] = 0;
                         }
-
                     }
                     ctx.clearRect(0, 0, width, height);
                     ctx.putImageData(id, 0, 0);
                 });
 
-                //ctx.globalCompositeOperation = 'source-over';
-                //ctx.drawImage(rgbImage, 0, 0);
-                //ctx.globalCompositeOperation = 'xor';
                 ctx.drawImage(alpha, 0, 0);
-
             });
         };
 
